@@ -11,10 +11,16 @@ internal class resfinder
 
 namespace WindowFinder
 {
+  [DefaultEvent("WindowHandleChanged")]
   [ToolboxBitmap(typeof(resfinder), "WindowFinder.WindowFinder.ico")]
   [Designer(typeof(WindowFinderDesigner))]
   public class WindowFinder : System.Windows.Forms.UserControl
 	{
+    /// <summary>
+    /// Called when the WindowHandle property is changed.
+    /// </summary>
+    public event EventHandler WindowHandleChanged;
+    
     bool bTargeting = false;
     Cursor cursorTarget = null;
     Bitmap bitmapFind = null;
@@ -25,11 +31,11 @@ namespace WindowFinder
     string windowClass = "";
     string windowText = "";
     bool isWindowUnicode = false;
-    string isWindowUnicodeText = "";
+    string windowCharset = "";
     private System.Windows.Forms.PictureBox picTarget;
     
     #region Class Variables
-
+    
     private System.ComponentModel.IContainer components;
     
     #endregion
@@ -98,44 +104,75 @@ namespace WindowFinder
     
     #endregion
     
+    /// <summary>
+    /// Handle of the window found.
+    /// </summary>
+    [Browsable(false)]
     public IntPtr WindowHandle
     { get { return windowHandle; } }
     
+    /// <summary>
+    /// Handle text of the window found.
+    /// </summary>
+    [Browsable(false)]
     public string WindowHandleText
     { get { return windowHandleText; } }
     
+    /// <summary>
+    /// Class of the window found.
+    /// </summary>
+    [Browsable(false)]
     public string WindowClass
     { get { return windowClass; } }
     
+    /// <summary>
+    /// Text of the window found.
+    /// </summary>
+    [Browsable(false)]
     public string WindowText
     { get { return windowText; } }
     
+    /// <summary>
+    /// Whether or not the found window is unicode.
+    /// </summary>
+    [Browsable(false)]
     public bool IsWindowUnicode
     { get { return isWindowUnicode; } }
     
-    public string IsWindowUnicodeText
-    { get { return isWindowUnicodeText; } }
+    /// <summary>
+    /// Whether or not the found window is unicode, via text.
+    /// </summary>
+    [Browsable(false)]
+    public string WindowCharset
+    { get { return windowCharset; } }
     
+    /// <summary>
+    /// Sets the window handle if handle is a valid window.
+    /// </summary>
+    /// <param name="handle">The handle to set to.</param>
     public void SetWindowHandle (IntPtr handle)
     {
       if ( (Win32.IsWindow(handle) == 0) || (Win32Ex.IsRelativeWindow(handle, this.Handle, true)) ) 
       {
+        // Clear window information
         windowHandle = IntPtr.Zero;
         windowHandleText = "";
         windowClass = "";
         windowText = "";
         isWindowUnicode = false;
-        isWindowUnicodeText = "";
-        return;
+        windowCharset = "";
       }
-      
-      // Set window information
-      windowHandle = handle;
-      windowHandleText = Convert.ToString(handle.ToInt32(), 16).ToUpper().PadLeft(8, '0');
-      windowClass = Win32Ex.GetClassName(handle);
-      windowText = Win32Ex.GetWindowText(handle);
-      isWindowUnicode = Win32.IsWindowUnicode(handle) != 0;
-      isWindowUnicodeText = (( isWindowUnicode )?( "Unicode" ):( "Ansi" ));
+      else
+      {
+        // Set window information
+        windowHandle = handle;
+        windowHandleText = Convert.ToString(handle.ToInt32(), 16).ToUpper().PadLeft(8, '0');
+        windowClass = Win32Ex.GetClassName(handle);
+        windowText = Win32Ex.GetWindowText(handle);
+        isWindowUnicode = Win32.IsWindowUnicode(handle) != 0;
+        windowCharset = (( isWindowUnicode )?( "Unicode" ):( "Ansi" ));
+      }
+      if (WindowHandleChanged != null) WindowHandleChanged(this, EventArgs.Empty);
     }
     
     private void WindowFinder_Load (object sender, System.EventArgs e)

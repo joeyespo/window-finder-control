@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 
 /// <summary> Win32 API. </summary>
-public class Win32
+internal class Win32
 {
   
   // ------------------------------------------------------------------------

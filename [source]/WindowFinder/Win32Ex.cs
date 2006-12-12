@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 
 /// <summary> Win32 API. </summary>
-public class Win32Ex : Win32
+internal class Win32Ex : Win32
 {
   public static string GetWindowText (IntPtr hWnd)
   {
