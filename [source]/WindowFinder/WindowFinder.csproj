@@ -31,7 +31,7 @@
                     FileAlignment = "4096"
                     IncrementalBuild = "true"
                     Optimize = "false"
-                    OutputPath = "bin\debug\"
+                    OutputPath = "bin\Debug\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -49,7 +49,7 @@
                     FileAlignment = "4096"
                     IncrementalBuild = "false"
                     Optimize = "true"
-                    OutputPath = "bin\release\"
+                    OutputPath = "bin\Release\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -105,10 +105,6 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
-                    RelPath = "bmpToolbarBitmap.bmp"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
                     RelPath = "curTarget.cur"
                     BuildAction = "EmbeddedResource"
                 />
@@ -123,6 +119,10 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "WindowFinder.bmp"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "WindowFinder.cs"
                     SubType = "UserControl"
                     BuildAction = "Compile"
@@ -130,10 +130,6 @@
                 <File
                     RelPath = "WindowFinder.resx"
                     DependentUpon = "WindowFinder.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "WindowFinder.ico"
                     BuildAction = "EmbeddedResource"
                 />
                 <File

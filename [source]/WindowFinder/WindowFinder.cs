@@ -12,7 +12,7 @@ internal class resfinder
 namespace WindowFinder
 {
   [DefaultEvent("WindowHandleChanged")]
-  [ToolboxBitmap(typeof(resfinder), "WindowFinder.WindowFinder.ico")]
+  [ToolboxBitmap(typeof(resfinder), "WindowFinder.WindowFinder.bmp")]
   [Designer(typeof(WindowFinderDesigner))]
   public class WindowFinder : System.Windows.Forms.UserControl
 	{
