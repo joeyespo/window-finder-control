@@ -1,0 +1,55 @@
+# Contents copied from .hgignore
+
+# C/C-Sharp Files
+*.ncb
+*.nlb
+*.aps
+*.clw
+
+# VB6 Files
+*.scc
+*.vbw
+*.pdb
+*.log
+
+# Python Files
+*.pyc
+
+# .NET Files
+*.dep
+*.aps
+*.vbw
+*.suo
+*.obj
+*.ncb
+*.plg
+*.bsc
+*.ilk 
+*.exp
+*.sbr
+*.opt
+*.pdb
+*.idb
+*.pch
+*.res
+*.user
+*.sln.cache
+./Resharp*
+
+# Build and Debug Files
+build/*
+Build/*
+BUILD/*
+bin/*
+Bin/*
+BIN/*
+obj/*
+Obj/*
+OBJ/*
+*.exe
+*.ex_
+
+# Misc and OS Files
+Desktop.ini
+Thumbs.db
+.DS_Store
