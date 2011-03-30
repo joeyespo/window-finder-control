@@ -27,6 +27,7 @@ namespace TestControl
         private void InitializeComponent()
         {
             this.gpbTrayMe = new System.Windows.Forms.GroupBox();
+            this.windowFinder = new WindowFinder.WindowFinder();
             this.lblWindowHandle = new System.Windows.Forms.Label();
             this.txtWindowHandle = new System.Windows.Forms.TextBox();
             this.lblWindowText = new System.Windows.Forms.Label();
@@ -37,7 +38,6 @@ namespace TestControl
             this.txtWindowClass = new System.Windows.Forms.TextBox();
             this.lblWindowClass = new System.Windows.Forms.Label();
             this.btnClose = new System.Windows.Forms.Button();
-            this.windowFinder = new WindowFinder.WindowFinder();
             this.gpbTrayMe.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -59,6 +59,14 @@ namespace TestControl
             this.gpbTrayMe.Size = new System.Drawing.Size(260, 184);
             this.gpbTrayMe.TabIndex = 0;
             this.gpbTrayMe.TabStop = false;
+            // 
+            // windowFinder
+            // 
+            this.windowFinder.Location = new System.Drawing.Point(108, 32);
+            this.windowFinder.Name = "windowFinder";
+            this.windowFinder.Size = new System.Drawing.Size(31, 28);
+            this.windowFinder.TabIndex = 1;
+            this.windowFinder.WindowHandleChanged += new System.EventHandler(this.windowFinder_WindowHandleChanged);
             // 
             // lblWindowHandle
             // 
@@ -143,17 +151,10 @@ namespace TestControl
             this.btnClose.Text = "Cl&ose";
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // windowFinder
-            // 
-            this.windowFinder.Location = new System.Drawing.Point(108, 32);
-            this.windowFinder.Name = "windowFinder";
-            this.windowFinder.Size = new System.Drawing.Size(31, 28);
-            this.windowFinder.TabIndex = 1;
-            this.windowFinder.WindowHandleChanged += new System.EventHandler(this.windowFinder_WindowHandleChanged);
-            // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+            this.CancelButton = this.btnClose;
             this.ClientSize = new System.Drawing.Size(380, 202);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.gpbTrayMe);

@@ -13,6 +13,9 @@ namespace WindowFinder
     [Designer(typeof(WindowFinderDesigner))]
     public sealed partial class WindowFinder : UserControl
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WindowFinder"/> class.
+        /// </summary>
         public WindowFinder()
         {
             // This call is required by the Windows.Forms Form Designer.
@@ -22,10 +25,18 @@ namespace WindowFinder
             SetStyle(ControlStyles.FixedHeight, true);
             SetStyle(ControlStyles.StandardClick, false);
             SetStyle(ControlStyles.StandardDoubleClick, false);
+            SetStyle(ControlStyles.Selectable, false);
 
             picTarget.Size = new Size(31, 28);
             Size = picTarget.Size;
         }
+
+        #region Public Properties
+
+        /// <summary>
+        /// Called when the WindowHandle property is changed.
+        /// </summary>
+        public event EventHandler WindowHandleChanged;
 
         /// <summary>
         /// Handle of the window found.
@@ -99,36 +110,15 @@ namespace WindowFinder
             }
         }
 
-        /// <summary>
-        /// Sets the window handle if handle is a valid window.
-        /// </summary>
-        /// <param name="handle">The handle to set to.</param>
-        public void SetWindowHandle(IntPtr handle)
-        {
-            if((Win32.IsWindow(handle) == 0) || (Win32.IsRelativeWindow(handle, this.Handle, true)))
-            {
-                // Clear window information
-                windowHandle = IntPtr.Zero;
-                windowHandleText = "";
-                windowClass = "";
-                windowText = "";
-                isWindowUnicode = false;
-                windowCharset = "";
-            }
-            else
-            {
-                // Set window information
-                windowHandle = handle;
-                windowHandleText = Convert.ToString(handle.ToInt32(), 16).ToUpper().PadLeft(8, '0');
-                windowClass = Win32.GetClassName(handle);
-                windowText = Win32.GetWindowText(handle);
-                isWindowUnicode = Win32.IsWindowUnicode(handle) != 0;
-                windowCharset = ((isWindowUnicode) ? ("Unicode") : ("Ansi"));
-            }
-            if(WindowHandleChanged != null)
-                WindowHandleChanged(this, EventArgs.Empty);
-        }
+        #endregion
 
+        #region Event Handler Methods
+
+        /// <summary>
+        /// Handles the Load event of the WindowFinder control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         private void WindowFinder_Load(object sender, System.EventArgs e)
         {
             this.Size = picTarget.Size;
@@ -155,6 +145,11 @@ namespace WindowFinder
             picTarget.Image = bitmapFind;
         }
 
+        /// <summary>
+        /// Handles the MouseDown event of the picTarget control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance containing the event data.</param>
         private void picTarget_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             // Set capture image and cursor
@@ -165,12 +160,18 @@ namespace WindowFinder
             Win32.SetCapture(picTarget.Handle);
 
             // Begin targeting
-            bTargeting = true;
-            hCurrentTarget = IntPtr.Zero;
+            isTargeting = true;
+            targetWindow = IntPtr.Zero;
 
             // Show info   TODO: Put into function for mousemove & mousedown
             SetWindowHandle(picTarget.Handle);
         }
+
+        /// <summary>
+        /// Handles the MouseMove event of the picTarget control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance containing the event data.</param>
         private void picTarget_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             IntPtr hWnd;
@@ -184,7 +185,7 @@ namespace WindowFinder
             Win32.ClientToScreen(picTarget.Handle, ref pt);
 
             // Make sure targeting before highlighting windows
-            if(!bTargeting)
+            if(!isTargeting)
                 return;
 
             // Get screen coords from client coords and window handle
@@ -224,20 +225,26 @@ namespace WindowFinder
             SetWindowHandle(hWnd);
 
             // Highlight valid window
-            highlightValidWindow(hWnd, this.Handle);
+            HighlightValidWindow(hWnd, this.Handle);
         }
+
+        /// <summary>
+        /// Handles the MouseUp event of the picTarget control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance containing the event data.</param>
         private void picTarget_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             IntPtr hWnd;
             IntPtr hTemp;
 
             // End targeting
-            bTargeting = false;
+            isTargeting = false;
 
             // Unhighlight window
-            if(hCurrentTarget != IntPtr.Zero)
-                Win32.HighlightWindow(hCurrentTarget);
-            hCurrentTarget = IntPtr.Zero;
+            if(targetWindow != IntPtr.Zero)
+                Win32.HighlightWindow(targetWindow);
+            targetWindow = IntPtr.Zero;
 
             // Reset capture image and cursor
             picTarget.Cursor = Cursors.Default;
@@ -256,50 +263,88 @@ namespace WindowFinder
             Win32.SetCapture(IntPtr.Zero);
         }
 
-        void highlightValidWindow(IntPtr hWnd, IntPtr hOwner)
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Sets the window handle if handle is a valid window.
+        /// </summary>
+        /// <param name="handle">The handle to set to.</param>
+        public void SetWindowHandle(IntPtr handle)
+        {
+            if((Win32.IsWindow(handle) == 0) || (Win32.IsRelativeWindow(handle, this.Handle, true)))
+            {
+                // Clear window information
+                windowHandle = IntPtr.Zero;
+                windowHandleText = string.Empty;
+                windowClass = string.Empty;
+                windowText = string.Empty;
+                isWindowUnicode = false;
+                windowCharset = string.Empty;
+            }
+            else
+            {
+                // Set window information
+                windowHandle = handle;
+                windowHandleText = Convert.ToString(handle.ToInt32(), 16).ToUpper().PadLeft(8, '0');
+                windowClass = Win32.GetClassName(handle);
+                windowText = Win32.GetWindowText(handle);
+                isWindowUnicode = Win32.IsWindowUnicode(handle) != 0;
+                windowCharset = ((isWindowUnicode) ? ("Unicode") : ("Ansi"));
+            }
+            if(WindowHandleChanged != null)
+                WindowHandleChanged(this, EventArgs.Empty);
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        /// <summary>
+        /// Highlights the specified window, but only if it is a valid window in relation to the specified owner window.
+        /// </summary>
+        private void HighlightValidWindow(IntPtr hWnd, IntPtr hOwner)
         {
             // Check for valid highlight
-            if(hCurrentTarget == hWnd)
+            if(targetWindow == hWnd)
                 return;
 
             // Check for relative
             if(Win32.IsRelativeWindow(hWnd, hOwner, true))
             {
                 // Unhighlight last window
-                if(hCurrentTarget != IntPtr.Zero)
+                if(targetWindow != IntPtr.Zero)
                 {
-                    Win32.HighlightWindow(hCurrentTarget);
-                    hCurrentTarget = IntPtr.Zero;
+                    Win32.HighlightWindow(targetWindow);
+                    targetWindow = IntPtr.Zero;
                 }
 
                 return;
             }
 
             // Unhighlight last window
-            Win32.HighlightWindow(hCurrentTarget);
+            Win32.HighlightWindow(targetWindow);
 
             // Set as current target
-            hCurrentTarget = hWnd;
+            targetWindow = hWnd;
 
             // Highlight window
             Win32.HighlightWindow(hWnd);
         }
 
-        /// <summary>
-        /// Called when the WindowHandle property is changed.
-        /// </summary>
-        public event EventHandler WindowHandleChanged;
+        #endregion
 
-        private bool bTargeting = false;
+        private bool isTargeting = false;
         private Cursor cursorTarget = null;
         private Bitmap bitmapFind = null;
         private Bitmap bitmapFinda = null;
-        private IntPtr hCurrentTarget = IntPtr.Zero;
+        private IntPtr targetWindow = IntPtr.Zero;
         private IntPtr windowHandle = IntPtr.Zero;
-        private string windowHandleText = "";
-        private string windowClass = "";
-        private string windowText = "";
+        private string windowHandleText = string.Empty;
+        private string windowClass = string.Empty;
+        private string windowText = string.Empty;
         private bool isWindowUnicode = false;
-        private string windowCharset = "";
+        private string windowCharset = string.Empty;
     }
 }
