@@ -8,11 +8,12 @@ user to select a top-level window by dragging a crosshair icon over it.
 Screenshots
 -----------
 
-![Window Finder Control: Screenshot 1](http://i.imgur.com/s15Mq.png)
+![Window Finder Control: Screenshot 1](http://s3.amazonaws.com/scrnshots.com/screenshots/284912/windowfinder_screenshot_01png)
 
-Test window for the control.
+The test window for the control.
 
 
-![Window Finder Control: Screenshot 2](http://i.imgur.com/TYakm.png)
+![Window Finder Control: Screenshot 2](http://s3.amazonaws.com/scrnshots.com/screenshots/284916/windowfinder_screenshot_02png)
 
-The control in action.
+The window finder control in action! The crosshair is being dragged over
+Calculator, which is highlighted, showing its class, text, and charset.
