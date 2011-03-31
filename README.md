@@ -13,6 +13,6 @@ Screenshots
 Test window for the control.
 
 
-![Window Finder Control: Screenshot 2](http://i.imgur.com/tKusv.png)
+![Window Finder Control: Screenshot 2](http://i.imgur.com/TYakm.png)
 
 The control in action.
