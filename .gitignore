@@ -37,15 +37,15 @@
 ./Resharp*
 
 # Build and Debug Files
-build/*
-Build/*
-BUILD/*
-bin/*
-Bin/*
-BIN/*
-obj/*
-Obj/*
-OBJ/*
+build/
+Build/
+BUILD/
+bin/
+Bin/
+BIN/
+obj/
+Obj/
+OBJ/
 *.exe
 *.ex_
 
