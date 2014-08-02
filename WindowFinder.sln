@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowFinder.Tests.WinApp", "WindowFinder.Tests.WinApp\WindowFinder.Tests.WinApp.csproj", "{6FE8E71F-7DC3-4061-9F4B-41061AB6B241}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowFinder", "WindowFinder\WindowFinder.csproj", "{84F4C41B-6887-4CDF-AC1C-E9C3AE1378A1}"
