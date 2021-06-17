@@ -1,5 +1,6 @@
 // Win32.cs
 // By Joe Esposito
+// [2021-06-17] Updated by Jimm Chen
 
 using System;
 using System.Drawing;
@@ -41,10 +42,10 @@ namespace WindowFinder
             string sResult;
 
             // !!!!! System.Text.Encoding
-            if(IsWindow(hWnd) == 0)
+            if (IsWindow(hWnd) == 0)
                 return "";
 
-            if(IsWindowUnicode(hWnd) != 0)
+            if (IsWindowUnicode(hWnd) != 0)
             {
                 // Allocate new Unicode string
                 lpString = Marshal.AllocHGlobal((cch = (GetWindowTextLengthW(hWnd) + 1)) * 2);
@@ -93,10 +94,10 @@ namespace WindowFinder
             string sResult;
 
             // !!!!! System.Text.Encoding
-            if(IsWindow(hWnd) == 0)
+            if (IsWindow(hWnd) == 0)
                 return "";
 
-            if(IsWindowUnicode(hWnd) != 0)
+            if (IsWindowUnicode(hWnd) != 0)
             {
                 // Allocate new Unicode string
                 lpString = Marshal.AllocHGlobal((cch = (windowClassNameLength + 1)) * 2);
@@ -139,13 +140,11 @@ namespace WindowFinder
         /// </summary>
         internal static IntPtr WindowFromPoint(IntPtr hClientWnd, int xPoint, int yPoint)
         {
-            POINTAPI pt;
+            Point pt = new Point(xPoint, yPoint);
 
-            pt.x = xPoint;
-            pt.y = yPoint;
             ClientToScreen(hClientWnd, ref pt);
 
-            return (IntPtr)WindowFromPoint(pt.x, pt.y);
+            return WindowFromPoint(pt);
         }
 
         /// <summary>
@@ -157,7 +156,7 @@ namespace WindowFinder
             RECT rt = new RECT();         // Rectangle area of the window.
 
             // Get the window DC of the window.
-            if((hDC = (IntPtr)GetWindowDC(hWnd)) == IntPtr.Zero)
+            if ((hDC = (IntPtr)GetWindowDC(hWnd)) == IntPtr.Zero)
                 return false;
 
             // Get the screen coordinates of the rectangle of the window.
@@ -190,11 +189,11 @@ namespace WindowFinder
             ;
 
             // Failsafe
-            if(hWnd == IntPtr.Zero)
+            if (hWnd == IntPtr.Zero)
                 return false;
-            if(hRelativeWindow == IntPtr.Zero)
+            if (hRelativeWindow == IntPtr.Zero)
                 return false;
-            if(hWnd == hRelativeWindow)
+            if (hWnd == hRelativeWindow)
                 return true;
 
             // Get processes and threads
@@ -202,7 +201,7 @@ namespace WindowFinder
             dwThreadOwner = GetWindowThreadProcessId(hRelativeWindow, ref dwProcessOwner);
 
             // Get relative info
-            if(bProcessAncestor)
+            if (bProcessAncestor)
                 return (dwProcess == dwProcessOwner);
             return (dwThread == dwThreadOwner);
         }
@@ -216,17 +215,20 @@ namespace WindowFinder
         [DllImport("user32", EntryPoint = "SetCapture", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         internal static extern int SetCapture(IntPtr hWnd);
 
-        [DllImport("user32", EntryPoint = "ClientToScreen", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
-        public static extern int ClientToScreen(IntPtr hWnd, ref POINTAPI lpPoint);
+        [DllImport("user32.dll")]
+        public static extern bool ClientToScreen(IntPtr hWnd, ref Point lpPoint);
 
+        // keep?
         [DllImport("user32", EntryPoint = "MapWindowPoints", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int MapWindowPoints(IntPtr hwndFrom, IntPtr hwndTo, ref RECT lprt, int cPoints);
 
-        [DllImport("user32", EntryPoint = "MapWindowPoints", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
-        public static extern int MapWindowPoints(IntPtr hwndFrom, IntPtr hwndTo, ref POINTAPI lppt, int cPoints);
+        [DllImport("user32", ExactSpelling = true, SetLastError = true)]
+        public static extern int MapWindowPoints(IntPtr hWndFrom, IntPtr hWndTo, [In, Out] ref System.Drawing.Point pt, [MarshalAs(UnmanagedType.U4)] int cPoints);
 
-        [DllImport("user32", EntryPoint = "ChildWindowFromPoint", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
-        public static extern int ChildWindowFromPoint(IntPtr hWnd, int xPoint, int yPoint);
+        //[DllImport("user32", EntryPoint = "ChildWindowFromPoint", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        //public static extern int ChildWindowFromPoint(IntPtr hWnd, int xPoint, int yPoint);
+        [DllImport("user32.dll")]
+        public static extern IntPtr ChildWindowFromPoint(IntPtr hWndParent, System.Drawing.Point pt);
 
         [DllImport("user32", EntryPoint = "GetParent", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern IntPtr GetParent(IntPtr hWnd);
@@ -258,8 +260,8 @@ namespace WindowFinder
         [DllImport("gdi32", EntryPoint = "CreateRectRgnIndirect", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int CreateRectRgnIndirect(ref RECT lpRect);
 
-        [DllImport("user32", EntryPoint = "WindowFromPoint", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
-        public static extern int WindowFromPoint(int xPoint, int yPoint);
+        [DllImport("user32.dll")]
+        public static extern IntPtr WindowFromPoint(System.Drawing.Point p);
 
         [DllImport("user32", EntryPoint = "GetWindowRgn", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetWindowRgn(IntPtr hWnd, IntPtr hRgn);

@@ -174,14 +174,11 @@ namespace WindowFinder
         /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance containing the event data.</param>
         private void picTarget_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            IntPtr hWnd;
             IntPtr hTemp;
-            Win32.POINTAPI pt;
+            System.Drawing.Point pt = new Point(e.X, e.Y);
 
             // TODO: Draw border around EVERY window
 
-            pt.x = e.X;
-            pt.y = e.Y;
             Win32.ClientToScreen(picTarget.Handle, ref pt);
 
             // Make sure targeting before highlighting windows
@@ -189,7 +186,7 @@ namespace WindowFinder
                 return;
 
             // Get screen coords from client coords and window handle
-            hWnd = Win32.WindowFromPoint(picTarget.Handle, e.X, e.Y);
+            IntPtr hWnd = Win32.WindowFromPoint(picTarget.Handle, e.X, e.Y);
 
             // Get real window
             if(hWnd != IntPtr.Zero)
@@ -199,7 +196,7 @@ namespace WindowFinder
                 while(true)
                 {
                     Win32.MapWindowPoints(hTemp, hWnd, ref pt, 1);
-                    hTemp = (IntPtr)Win32.ChildWindowFromPoint(hWnd, pt.x, pt.y);
+                    hTemp = (IntPtr)Win32.ChildWindowFromPoint(hWnd, pt);
                     if(hTemp == IntPtr.Zero)
                         break;
                     if(hWnd == hTemp)
