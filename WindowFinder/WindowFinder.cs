@@ -4,6 +4,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 using System.Data;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace WindowFinder
@@ -163,7 +164,7 @@ namespace WindowFinder
             isTargeting = true;
             targetWindow = IntPtr.Zero;
 
-            // Show info   TODO: Put into function for mousemove & mousedown
+            // Show info
             SetWindowHandle(picTarget.Handle);
         }
 
@@ -174,55 +175,60 @@ namespace WindowFinder
         /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance containing the event data.</param>
         private void picTarget_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            IntPtr hTemp;
-            System.Drawing.Point pt = new Point(e.X, e.Y);
-
-            // TODO: Draw border around EVERY window
-
-            Win32.ClientToScreen(picTarget.Handle, ref pt);
-
             // Make sure targeting before highlighting windows
             if(!isTargeting)
                 return;
 
+            System.Drawing.Point pt = new Point(e.X, e.Y);
+
+            Win32.ClientToScreen(picTarget.Handle, ref pt);
+
             // Get screen coords from client coords and window handle
-            IntPtr hWnd = Win32.WindowFromPoint(picTarget.Handle, e.X, e.Y);
+            IntPtr hChild1 = Win32.WindowFromPoint(IntPtr.Zero, pt.X, pt.Y);
+            // -- We name it "child" bcz it must be a child-or-grand-child of the Desktop window.
+
+            Debug.WriteLine($"WindowFromPoint(SCREEN, {pt.X}, {pt.Y}) = {(uint)hChild1:X8}");
 
             // Get real window
-            if(hWnd != IntPtr.Zero)
+            if (hChild1 != IntPtr.Zero)
             {
-                hTemp = IntPtr.Zero;
+                // MSDN undoc: 
+                // Case 1: Under normal situation, WindowFromPoint() gives us most visible child-window HWND.
+                // Case 2: If top-level window X brings up a modal dialog(About box etc), then a child window
+                //         of X will not be reported by WindowFromPoint() but X is reported instead.
+                // To cope with Case 2, we have to call ChildWindowFromPointEx() recursively until we find
+                // the most visible window.
+
+                IntPtr hParent = IntPtr.Zero;
 
                 while(true)
                 {
-                    Win32.MapWindowPoints(hTemp, hWnd, ref pt, 1);
-                    hTemp = (IntPtr)Win32.ChildWindowFromPoint(hWnd, pt);
-                    if(hTemp == IntPtr.Zero)
-                        break;
-                    if(hWnd == hTemp)
-                        break;
-                    hWnd = hTemp;
-                }
+                    Win32.MapWindowPoints(hParent, hChild1, ref pt, 1);
 
-                /* TODO: Work with ALL windows
-                Win32.ScreenToClient(hWnd, ref pt);
-                Win32.MapWindowPoints(IntPtr.Zero, hWnd, ref pt, 2);
-                if ((hTemp = (IntPtr)Win32.ChildWindowFromPoint(hWnd, pt.x, pt.y)) != IntPtr.Zero) 
-                {
-                  hWnd = hTemp;
+                    IntPtr hChild2 = (IntPtr)Win32.ChildWindowFromPointEx(hChild1, pt,
+                        Win32.ChildWindowFromPointFlags.CWP_SKIPINVISIBLE);
+
+                    Debug.WriteLine($"ChildWindowFromPoint: {(uint)hChild1:X8} => {(uint)hChild2:X8} ({pt.X},{pt.Y})");
+
+                    if(hChild2 == IntPtr.Zero)
+                        break;
+                    if(hChild1 == hChild2)
+                        break;
+
+                    hParent = hChild1;
+                    hChild1 = hChild2;
                 }
-                // */
             }
 
-            // Get owner
-            while((hTemp = Win32.GetParent(hWnd)) != IntPtr.Zero)
-                hWnd = hTemp;
+            // Get owner // todo: Make this an option
+//            while((hTemp = Win32.GetParent(hWnd)) != IntPtr.Zero)
+//                hWnd = hTemp;
 
             // Show info
-            SetWindowHandle(hWnd);
+            SetWindowHandle(hChild1);
 
             // Highlight valid window
-            HighlightValidWindow(hWnd, this.Handle);
+            HighlightValidWindow(hChild1, this.Handle);
         }
 
         /// <summary>
@@ -232,29 +238,20 @@ namespace WindowFinder
         /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance containing the event data.</param>
         private void picTarget_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            IntPtr hWnd;
-            IntPtr hTemp;
-
             // End targeting
             isTargeting = false;
 
             // Unhighlight window
-            if(targetWindow != IntPtr.Zero)
+            if (targetWindow != IntPtr.Zero)
+            {
                 Win32.HighlightWindow(targetWindow);
-            targetWindow = IntPtr.Zero;
+
+                targetWindow = IntPtr.Zero;
+            }
 
             // Reset capture image and cursor
             picTarget.Cursor = Cursors.Default;
             picTarget.Image = bitmapFind;
-
-            // Get screen coords from client coords and window handle
-            hWnd = Win32.WindowFromPoint(picTarget.Handle, e.X, e.Y);
-
-            // Get owner
-            while((hTemp = Win32.GetParent(hWnd)) != IntPtr.Zero)
-                hWnd = hTemp;
-
-            SetWindowHandle(hWnd);
 
             // Release capture
             Win32.SetCapture(IntPtr.Zero);
@@ -290,6 +287,7 @@ namespace WindowFinder
                 isWindowUnicode = Win32.IsWindowUnicode(handle) != 0;
                 windowCharset = ((isWindowUnicode) ? ("Unicode") : ("Ansi"));
             }
+
             if(WindowHandleChanged != null)
                 WindowHandleChanged(this, EventArgs.Empty);
         }

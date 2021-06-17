@@ -230,6 +230,17 @@ namespace WindowFinder
         [DllImport("user32.dll")]
         public static extern IntPtr ChildWindowFromPoint(IntPtr hWndParent, System.Drawing.Point pt);
 
+        [DllImport("user32.dll")]
+        public static extern IntPtr ChildWindowFromPointEx(IntPtr hWndParent, Point pt, ChildWindowFromPointFlags uFlags);
+        //
+        [Flags] public enum ChildWindowFromPointFlags : uint
+        {
+            CWP_ALL = 0x0000,
+            CWP_SKIPINVISIBLE = 0x0001,
+            CWP_SKIPDISABLED = 0x0002,
+            CWP_SKIPTRANSPARENT = 0x0004
+        }
+
         [DllImport("user32", EntryPoint = "GetParent", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern IntPtr GetParent(IntPtr hWnd);
 
@@ -284,6 +295,11 @@ namespace WindowFinder
         [DllImport("user32", EntryPoint = "ReleaseDC", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int ReleaseDC(IntPtr hWnd, IntPtr hdc);
 
+        [DllImport("gdi32.dll", ExactSpelling = true, PreserveSig = true, SetLastError = true)]
+        static extern bool Ellipse(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+
+        [DllImport("user32.dll")]
+        static extern int FrameRect(IntPtr hdc, [In] ref RECT lprc, IntPtr hbr);
         // Binary raster ops
         public const int R2_NOT = unchecked((int)(6));//  Dn
 
