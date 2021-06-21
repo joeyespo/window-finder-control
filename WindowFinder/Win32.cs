@@ -159,6 +159,7 @@ namespace WindowFinder
             if ((hDC = (IntPtr)GetWindowDC(hWnd)) == IntPtr.Zero)
                 return false;
 
+            
             // Get the screen coordinates of the rectangle of the window.
             GetWindowRect(hWnd, ref rt);
             rt.right -= rt.left;
@@ -168,7 +169,8 @@ namespace WindowFinder
 
             // Draw a border in the DC covering the entire window area of the window.
             IntPtr hRgn = (IntPtr)CreateRectRgnIndirect(ref rt);
-            GetWindowRgn(hWnd, hRgn);
+            
+            // int getret = GetWindowRgn(hWnd, hRgn); // This seems to always return ERROR(0), no region.
             SetROP2(hDC, R2_NOT);
             FrameRgn(hDC, hRgn, (IntPtr)GetStockObject(WHITE_BRUSH), 3, 3);
             DeleteObject(hRgn);
@@ -274,8 +276,17 @@ namespace WindowFinder
         [DllImport("user32.dll")]
         public static extern IntPtr WindowFromPoint(System.Drawing.Point p);
 
+        [DllImport("gdi32.dll")]
+        public static extern IntPtr CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+
         [DllImport("user32", EntryPoint = "GetWindowRgn", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetWindowRgn(IntPtr hWnd, IntPtr hRgn);
+        //  Region Flags - The return value specifies the type of the region that the function obtains. It can be one of the following values.
+        const int ERROR = 0;
+        const int NULLREGION = 1;
+        const int SIMPLEREGION = 2;
+        const int COMPLEXREGION = 3;
+
 
         [DllImport("gdi32", EntryPoint = "SetROP2", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int SetROP2(IntPtr hdc, int nDrawMode);
