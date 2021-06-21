@@ -15,8 +15,7 @@ REM customize COPY_TO_DIRS's value to be your copying target dirs.
 REM You can list multiple target dirs, separated by spaces.
 REM For example, assign two remote machine folders for remote debugging:
 REM 
-set COPY_TO_DIRS=
-    REM z:\bin y:\bin2
+set COPY_TO_DIRS=z:\bin y:\bin2
 REM
 REM =========================================================================
 
