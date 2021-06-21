@@ -159,7 +159,7 @@ namespace WindowFinder
             IntPtr hDC; // The DC of the window.
             RECT rt = new RECT(); // Rectangle area of the window.
 
-            float scalex = 1, scaley = 1;
+            float scale_factor = 1;
 
             // Get the window DC of the window.
             if ((hDC = (IntPtr) GetWindowDC(hWnd)) == IntPtr.Zero)
@@ -169,10 +169,9 @@ namespace WindowFinder
 
             if (IsAboveWin10_1607())
             {
-                // For Win10.1607, We need to switch to correct HWND perspective during the course of
+                // For Win10.1607, We need to switch to correct perspectives during the course of
                 // * calling GetWindowRect()
                 // * calling FramRgn()
-                // -- Choose from Stretch-mode *or* Per-monitor-mode.
 
                 int target_hwnd_dpi = 0; // to be filled
                 IntPtr target_hwnd_ctx = DpiUtilities.GetWindowDpiAwarenessContext(hWnd);
@@ -180,15 +179,24 @@ namespace WindowFinder
 
                 if (daw == DpiUtilities.DPI_AWARENESS.DPI_AWARENESS_PER_MONITOR_AWARE)
                 {
+                    // Target HWND is Per-monitor mode, so we switch our thread to Per-monitor mode as well,
+                    // so that GetWindowRect() and FrameRgn() all operates in physical(=pixel) coordinate.
+
                     thread_oldctx = DpiUtilities.SetThreadDpiAwarenessContext(DpiUtilities.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
                 }
                 else
                 {
+                    // Target HWND is NOT Per-monitor mode, so we switch our thread to DPI-unaware mode. So,
+                    // GetWindowRect() gives up coordinates in 96DPI perspective.
+                    // Then we scale the window width-and-height by a scaling factor.
+                    // -- for example, target HWND is 144DPI, the scale_factor will be 1.5 .
+                    // Finally, we call FrameRgn() with scaled-up width-and-height bcz the coordinates
+                    // to FrameRgn() is in target-HWND's perspective, not in our thread's perspective.
+
                     thread_oldctx = DpiUtilities.SetThreadDpiAwarenessContext(DpiUtilities.DPI_AWARENESS_CONTEXT_UNAWARE);
                     target_hwnd_dpi = DpiUtilities.GetDpiForWindow(hWnd);
 
-                    scalex = (float)target_hwnd_dpi / 96;
-                    scaley = (float)target_hwnd_dpi / 96;
+                    scale_factor = (float)target_hwnd_dpi / 96;
                 }
             }
 
@@ -200,14 +208,12 @@ namespace WindowFinder
             rt.bottom -= rt.top;
             rt.top = 0;
 
-            rt.right = (int)(rt.right * scalex);
-            rt.bottom = (int)(rt.bottom * scaley);
-
+            rt.right = (int)(rt.right * scale_factor);
+            rt.bottom = (int)(rt.bottom * scale_factor);
 
             // Draw a border in the DC covering the entire window area of the window.
             IntPtr hRgn = (IntPtr) CreateRectRgnIndirect(ref rt);
 
-            // int getret = GetWindowRgn(hWnd, hRgn); // This seems to always return ERROR(0), no region.
             SetROP2(hDC, R2_NOT);
             FrameRgn(hDC, hRgn, (IntPtr) GetStockObject(WHITE_BRUSH), 3, 3);
             DeleteObject(hRgn);
@@ -217,6 +223,7 @@ namespace WindowFinder
 
             if (IsAboveWin10_1607())
             {
+                // Restore our thread's original perspective.
                 DpiUtilities.SetThreadDpiAwarenessContext(thread_oldctx);
             }
 
