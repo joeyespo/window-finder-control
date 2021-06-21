@@ -3,6 +3,7 @@
 // [2021-06-17] Updated by Jimm Chen
 
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
@@ -22,7 +23,8 @@ namespace WindowFinder
         }
 
         // Type definitions for Windows' basic types.
-        public const int ANYSIZE_ARRAY = unchecked((int)(1));
+        public const int ANYSIZE_ARRAY = unchecked((int) (1));
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public struct RECT
         {
@@ -152,31 +154,78 @@ namespace WindowFinder
         /// </summary>
         internal static bool HighlightWindow(IntPtr hWnd)
         {
-            IntPtr hDC;                   // The DC of the window.
-            RECT rt = new RECT();         // Rectangle area of the window.
+            if (hWnd == IntPtr.Zero)
+                return true;
+
+            IntPtr hDC; // The DC of the window.
+            RECT rt = new RECT(); // Rectangle area of the window.
+
+            float scalex = 1, scaley = 1;
 
             // Get the window DC of the window.
-            if ((hDC = (IntPtr)GetWindowDC(hWnd)) == IntPtr.Zero)
+            if ((hDC = (IntPtr) GetWindowDC(hWnd)) == IntPtr.Zero)
                 return false;
 
-            
+            IntPtr thread_oldctx = IntPtr.Zero; // only useful for Win10.1607
+
+            if (IsAboveWin10_1607())
+            {
+                // For Win10.1607, We need to switch to correct HWND perspective during the course of
+                // * calling GetWindowRect()
+                // * calling FramRgn()
+                // -- Choose from Stretch-mode *or* Per-monitor-mode.
+
+                int target_hwnd_dpi = 0; // to be filled
+                IntPtr target_hwnd_ctx = DpiUtilities.GetWindowDpiAwarenessContext(hWnd);
+                DpiUtilities.DPI_AWARENESS daw = DpiUtilities.GetAwarenessFromDpiAwarenessContext(target_hwnd_ctx);
+
+                if (daw == DpiUtilities.DPI_AWARENESS.DPI_AWARENESS_PER_MONITOR_AWARE)
+                {
+                    thread_oldctx = DpiUtilities.SetThreadDpiAwarenessContext(DpiUtilities.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+                }
+                else
+                {
+                    thread_oldctx = DpiUtilities.SetThreadDpiAwarenessContext(DpiUtilities.DPI_AWARENESS_CONTEXT_UNAWARE);
+                    target_hwnd_dpi = DpiUtilities.GetDpiForWindow(hWnd);
+
+                    scalex = (float)target_hwnd_dpi / 96;
+                    scaley = (float)target_hwnd_dpi / 96;
+                }
+
+                GetWindowRect(hWnd, out rt); //GetWindowRect_hwndpers(hWnd, out rt);
+                Debug.WriteLine($"### target_hwnd_dpi={(int)target_hwnd_dpi}, daw={daw} , [{rt.right - rt.left} x {rt.bottom - rt.top}]");
+
+            }
+
             // Get the screen coordinates of the rectangle of the window.
-            GetWindowRect(hWnd, ref rt);
+            GetWindowRect(hWnd, out rt); //GetWindowRect_hwndpers(hWnd, out rt);
+
             rt.right -= rt.left;
             rt.left = 0;
             rt.bottom -= rt.top;
             rt.top = 0;
 
+            rt.right = (int)(rt.right * scalex);
+            rt.bottom = (int)(rt.bottom * scaley);
+
+
+            Debug.WriteLine($">>> HighltWidth {rt.right} x {rt.bottom}");
+
             // Draw a border in the DC covering the entire window area of the window.
-            IntPtr hRgn = (IntPtr)CreateRectRgnIndirect(ref rt);
-            
+            IntPtr hRgn = (IntPtr) CreateRectRgnIndirect(ref rt);
+
             // int getret = GetWindowRgn(hWnd, hRgn); // This seems to always return ERROR(0), no region.
             SetROP2(hDC, R2_NOT);
-            FrameRgn(hDC, hRgn, (IntPtr)GetStockObject(WHITE_BRUSH), 3, 3);
+            FrameRgn(hDC, hRgn, (IntPtr) GetStockObject(WHITE_BRUSH), 3, 3);
             DeleteObject(hRgn);
 
             // Finally release the DC.
             ReleaseDC(hWnd, hDC);
+
+            if (IsAboveWin10_1607())
+            {
+                DpiUtilities.SetThreadDpiAwarenessContext(thread_oldctx);
+            }
 
             return true;
         }
@@ -208,24 +257,51 @@ namespace WindowFinder
             return (dwThread == dwThreadOwner);
         }
 
-        [DllImport("user32", EntryPoint = "IsWindow", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        private static int s_isAboveWin10_1607 = -1;
+
+        //
+        public static bool IsAboveWin10_1607()
+        {
+            if (s_isAboveWin10_1607 == -1)
+            {
+                try
+                {
+                    int dpi = DpiUtilities.GetDpiForSystem();
+                    s_isAboveWin10_1607 = 1;
+                }
+                catch
+                {
+                    s_isAboveWin10_1607 = 0;
+                }
+            }
+
+            return s_isAboveWin10_1607 == 1 ? true : false;
+        }
+
+
+        [DllImport("user32", EntryPoint = "IsWindow", SetLastError = true, CharSet = CharSet.Auto,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         internal static extern int IsWindow(IntPtr hWnd);
 
-        [DllImport("user32", EntryPoint = "IsWindowUnicode", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "IsWindowUnicode", SetLastError = true, CharSet = CharSet.Auto,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         internal static extern int IsWindowUnicode(IntPtr hWnd);
 
-        [DllImport("user32", EntryPoint = "SetCapture", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "SetCapture", SetLastError = true, CharSet = CharSet.Auto,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         internal static extern int SetCapture(IntPtr hWnd);
 
         [DllImport("user32.dll")]
         public static extern bool ClientToScreen(IntPtr hWnd, ref Point lpPoint);
 
         // keep?
-        [DllImport("user32", EntryPoint = "MapWindowPoints", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "MapWindowPoints", SetLastError = true, CharSet = CharSet.Auto,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int MapWindowPoints(IntPtr hwndFrom, IntPtr hwndTo, ref RECT lprt, int cPoints);
 
         [DllImport("user32", ExactSpelling = true, SetLastError = true)]
-        public static extern int MapWindowPoints(IntPtr hWndFrom, IntPtr hWndTo, [In, Out] ref System.Drawing.Point pt, [MarshalAs(UnmanagedType.U4)] int cPoints);
+        public static extern int MapWindowPoints(IntPtr hWndFrom, IntPtr hWndTo, [In, Out] ref System.Drawing.Point pt,
+            [MarshalAs(UnmanagedType.U4)] int cPoints);
 
         //[DllImport("user32", EntryPoint = "ChildWindowFromPoint", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         //public static extern int ChildWindowFromPoint(IntPtr hWnd, int xPoint, int yPoint);
@@ -233,9 +309,12 @@ namespace WindowFinder
         public static extern IntPtr ChildWindowFromPoint(IntPtr hWndParent, System.Drawing.Point pt);
 
         [DllImport("user32.dll")]
-        public static extern IntPtr ChildWindowFromPointEx(IntPtr hWndParent, Point pt, ChildWindowFromPointFlags uFlags);
+        public static extern IntPtr ChildWindowFromPointEx(IntPtr hWndParent, Point pt,
+            ChildWindowFromPointFlags uFlags);
+
         //
-        [Flags] public enum ChildWindowFromPointFlags : uint
+        [Flags]
+        public enum ChildWindowFromPointFlags : uint
         {
             CWP_ALL = 0x0000,
             CWP_SKIPINVISIBLE = 0x0001,
@@ -243,34 +322,43 @@ namespace WindowFinder
             CWP_SKIPTRANSPARENT = 0x0004
         }
 
-        [DllImport("user32", EntryPoint = "GetParent", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "GetParent", SetLastError = true, CharSet = CharSet.Auto,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern IntPtr GetParent(IntPtr hWnd);
 
-        [DllImport("user32", EntryPoint = "GetWindowTextLengthA", SetLastError = true, CharSet = CharSet.Ansi, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "GetWindowTextLengthA", SetLastError = true, CharSet = CharSet.Ansi,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetWindowTextLengthA(IntPtr hWnd);
 
-        [DllImport("user32", EntryPoint = "GetWindowTextLengthW", SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "GetWindowTextLengthW", SetLastError = true, CharSet = CharSet.Unicode,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetWindowTextLengthW(IntPtr hWnd);
 
-        [DllImport("user32", EntryPoint = "GetWindowTextA", SetLastError = true, CharSet = CharSet.Ansi, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "GetWindowTextA", SetLastError = true, CharSet = CharSet.Ansi,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetWindowTextA(IntPtr hWnd, IntPtr lpString, int cch);
 
-        [DllImport("user32", EntryPoint = "GetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "GetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetWindowTextW(IntPtr hWnd, IntPtr lpString, int cch);
 
-        [DllImport("user32", EntryPoint = "GetClassNameA", SetLastError = true, CharSet = CharSet.Ansi, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "GetClassNameA", SetLastError = true, CharSet = CharSet.Ansi,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetClassNameA(IntPtr hWnd, IntPtr lpClassName, int nMaxCount);
 
-        [DllImport("user32", EntryPoint = "GetClassNameW", SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "GetClassNameW", SetLastError = true, CharSet = CharSet.Unicode,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetClassNameW(IntPtr hWnd, IntPtr lpClassName, int nMaxCount);
 
-        [DllImport("user32", EntryPoint = "GetWindowDC", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "GetWindowDC", SetLastError = true, CharSet = CharSet.Auto,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetWindowDC(IntPtr hWnd);
 
-        [DllImport("user32", EntryPoint = "GetWindowRect", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
-        public static extern int GetWindowRect(IntPtr hWnd, ref RECT lpRect);
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
 
-        [DllImport("gdi32", EntryPoint = "CreateRectRgnIndirect", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("gdi32", EntryPoint = "CreateRectRgnIndirect", SetLastError = true, CharSet = CharSet.Auto,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int CreateRectRgnIndirect(ref RECT lpRect);
 
         [DllImport("user32.dll")]
@@ -279,8 +367,10 @@ namespace WindowFinder
         [DllImport("gdi32.dll")]
         public static extern IntPtr CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 
-        [DllImport("user32", EntryPoint = "GetWindowRgn", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "GetWindowRgn", SetLastError = true, CharSet = CharSet.Auto,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetWindowRgn(IntPtr hWnd, IntPtr hRgn);
+
         //  Region Flags - The return value specifies the type of the region that the function obtains. It can be one of the following values.
         const int ERROR = 0;
         const int NULLREGION = 1;
@@ -288,22 +378,28 @@ namespace WindowFinder
         const int COMPLEXREGION = 3;
 
 
-        [DllImport("gdi32", EntryPoint = "SetROP2", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("gdi32", EntryPoint = "SetROP2", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false,
+            CallingConvention = CallingConvention.Winapi)]
         public static extern int SetROP2(IntPtr hdc, int nDrawMode);
 
-        [DllImport("gdi32", EntryPoint = "FrameRgn", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("gdi32", EntryPoint = "FrameRgn", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false,
+            CallingConvention = CallingConvention.Winapi)]
         public static extern int FrameRgn(IntPtr hdc, IntPtr hRgn, IntPtr hBrush, int nWidth, int nHeight);
 
-        [DllImport("gdi32", EntryPoint = "GetStockObject", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("gdi32", EntryPoint = "GetStockObject", SetLastError = true, CharSet = CharSet.Auto,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetStockObject(int nIndex);
 
-        [DllImport("user32", EntryPoint = "GetWindowThreadProcessId", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "GetWindowThreadProcessId", SetLastError = true, CharSet = CharSet.Auto,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetWindowThreadProcessId(IntPtr hWnd, ref int lpdwProcessId);
 
-        [DllImport("gdi32", EntryPoint = "DeleteObject", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("gdi32", EntryPoint = "DeleteObject", SetLastError = true, CharSet = CharSet.Auto,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int DeleteObject(IntPtr hObject);
 
-        [DllImport("user32", EntryPoint = "ReleaseDC", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
+        [DllImport("user32", EntryPoint = "ReleaseDC", SetLastError = true, CharSet = CharSet.Auto,
+            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int ReleaseDC(IntPtr hWnd, IntPtr hdc);
 
         [DllImport("gdi32.dll", ExactSpelling = true, PreserveSig = true, SetLastError = true)]
@@ -311,10 +407,77 @@ namespace WindowFinder
 
         [DllImport("user32.dll")]
         static extern int FrameRect(IntPtr hdc, [In] ref RECT lprc, IntPtr hbr);
+
         // Binary raster ops
-        public const int R2_NOT = unchecked((int)(6));//  Dn
+        public const int R2_NOT = unchecked((int) (6)); //  Dn
 
         // Stock Logical Objects
-        public const int WHITE_BRUSH = unchecked((int)(0));
+        public const int WHITE_BRUSH = unchecked((int) (0));
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern IntPtr GetDC(IntPtr hWnd);
+
+        [DllImport("gdi32.dll")]
+        static extern int GetDeviceCaps(IntPtr hdc, DeviceCap nIndex);
+
+        //
+        public enum DeviceCap
+        {
+            /// <summary>
+            /// Horizontal width in pixels
+            /// </summary>
+            HORZRES = 8,
+
+            /// <summary>
+            /// Vertical height in pixels
+            /// </summary>
+            VERTRES = 10,
+
+            /// <summary>
+            /// Vertical height of entire desktop in pixels
+            /// </summary>
+            DESKTOPVERTRES = 117,
+
+            /// <summary>
+            /// Horizontal width of entire desktop in pixels
+            /// </summary>
+            DESKTOPHORZRES = 118,
+        }
+    }
+
+    public static class DpiUtilities
+    {
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr DpiAwarenessContext); // Win10.1607
+        // -- return old DPI_AWARENESS_CONTEXT enum for this thread
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetWindowDpiAwarenessContext(IntPtr hwnd);
+        // -- return DPI_AWARENESS_CONTEXT enum for this hwnd
+
+        // DPI_AWARENESS_CONTEXT enum values:
+        public static IntPtr DPI_AWARENESS_CONTEXT_UNAWARE = (IntPtr)(-1);
+        public static IntPtr DPI_AWARENESS_CONTEXT_SYSTEM_AWARE = (IntPtr)(-2);
+        public static IntPtr DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE = (IntPtr)(-3); // we only use this here
+        public static IntPtr DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = (IntPtr)(-4);
+
+        [DllImport("user32.dll")]
+        public static extern DPI_AWARENESS GetAwarenessFromDpiAwarenessContext(IntPtr dpi_awareness_context);
+        //
+        public enum DPI_AWARENESS : int
+        {
+            DPI_AWARENESS_INVALID = -1,
+            DPI_AWARENESS_UNAWARE = 0,
+            DPI_AWARENESS_SYSTEM_AWARE = 1,
+            DPI_AWARENESS_PER_MONITOR_AWARE = 2
+        }
+
+
+        [DllImport("user32.dll")]
+        public static extern int GetDpiForWindow(IntPtr hwnd); // Win10.1607
+
+        [DllImport("user32.dll")]
+        public static extern int GetDpiForSystem(); // Win10.1607
+
     }
 }
