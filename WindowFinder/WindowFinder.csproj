@@ -135,7 +135,6 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>$(SolutionDir)_VSPG\VSPG-Start9.bat $(SolutionDir)_VSPG\VSPG-PostBuild7.bat $(ProjectDir)ResourceFinder.cs $(SolutionDir) $(ProjectDir) $(Configuration) $(PlatformName) $(TargetDir) $(TargetFileName) $(TargetName)</PostBuildEvent>
   </PropertyGroup>
 </Project>
