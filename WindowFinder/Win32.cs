@@ -1,9 +1,8 @@
 // Win32.cs
 // By Joe Esposito
-// [2021-06-17] Updated by Jimm Chen
+// [2021-06-21] Updated by Jimm Chen, now works with Win1.1607 mixed-mode DPI scaling.
 
 using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
@@ -191,14 +190,10 @@ namespace WindowFinder
                     scalex = (float)target_hwnd_dpi / 96;
                     scaley = (float)target_hwnd_dpi / 96;
                 }
-
-                GetWindowRect(hWnd, out rt); //GetWindowRect_hwndpers(hWnd, out rt);
-                Debug.WriteLine($"### target_hwnd_dpi={(int)target_hwnd_dpi}, daw={daw} , [{rt.right - rt.left} x {rt.bottom - rt.top}]");
-
             }
 
             // Get the screen coordinates of the rectangle of the window.
-            GetWindowRect(hWnd, out rt); //GetWindowRect_hwndpers(hWnd, out rt);
+            GetWindowRect(hWnd, out rt);
 
             rt.right -= rt.left;
             rt.left = 0;
@@ -208,8 +203,6 @@ namespace WindowFinder
             rt.right = (int)(rt.right * scalex);
             rt.bottom = (int)(rt.bottom * scaley);
 
-
-            Debug.WriteLine($">>> HighltWidth {rt.right} x {rt.bottom}");
 
             // Draw a border in the DC covering the entire window area of the window.
             IntPtr hRgn = (IntPtr) CreateRectRgnIndirect(ref rt);

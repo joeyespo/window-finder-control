@@ -187,8 +187,6 @@ namespace WindowFinder
             IntPtr hChild1 = Win32.WindowFromPoint(IntPtr.Zero, pt.X, pt.Y);
             // -- We name it "child" bcz it must be a child-or-grand-child of the Desktop window.
 
-            Debug.WriteLine($"WindowFromPoint(SCREEN, {pt.X}, {pt.Y}) = {(uint)hChild1:X8}");
-
             // Get real window
             if (hChild1 != IntPtr.Zero)
             {
@@ -207,8 +205,6 @@ namespace WindowFinder
 
                     IntPtr hChild2 = (IntPtr)Win32.ChildWindowFromPointEx(hChild1, pt,
                         Win32.ChildWindowFromPointFlags.CWP_SKIPINVISIBLE);
-
-                    Debug.WriteLine($"ChildWindowFromPoint: {(uint)hChild1:X8} => {(uint)hChild2:X8} ({pt.X},{pt.Y})");
 
                     if(hChild2 == IntPtr.Zero)
                         break;
