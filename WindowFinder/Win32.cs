@@ -326,6 +326,25 @@ namespace WindowFinder
             ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern IntPtr GetParent(IntPtr hWnd);
 
+        [DllImport("user32.dll", ExactSpelling = true)]
+        public static extern IntPtr GetAncestor(IntPtr hwnd, GetAncestorFlags flags);
+        //
+        public enum GetAncestorFlags
+        {
+            /// <summary>
+            /// Retrieves the parent window. This does not include the owner, as it does with the GetParent function.
+            /// </summary>
+            GetParent = 1,
+            /// <summary>
+            /// Retrieves the root window by walking the chain of parent windows.
+            /// </summary>
+            GetRoot = 2,
+            /// <summary>
+            /// Retrieves the owned root window by walking the chain of parent and owner windows returned by GetParent.
+            /// </summary>
+            GetRootOwner = 3
+        }
+
         [DllImport("user32", EntryPoint = "GetWindowTextLengthA", SetLastError = true, CharSet = CharSet.Ansi,
             ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetWindowTextLengthA(IntPtr hWnd);

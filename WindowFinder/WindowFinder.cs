@@ -30,6 +30,21 @@ namespace WindowFinder
 
             picTarget.Size = new Size(31, 28);
             Size = picTarget.Size;
+
+            _timerCheckKey = new Timer();
+            _timerCheckKey.Interval = 100;
+            _timerCheckKey.Tick += new EventHandler(TimerCheckKey);
+        }
+
+        void TimerCheckKey(object obj, EventArgs ea)
+        {
+            bool isCtrlKeyDown = Control.ModifierKeys == Keys.Control;
+
+            if (isCtrlKeyDown != _wasCtrlKeyDown)
+            {
+                _wasCtrlKeyDown = isCtrlKeyDown;
+                RetargetMyHwnd();
+            }
         }
 
         #region Public Properties
@@ -111,6 +126,12 @@ namespace WindowFinder
             }
         }
 
+        /// <summary>
+        /// If true, only top-level window can be highlighted.
+        /// </summary>
+        [Browsable(true)]
+        public bool isFindOnlyTopLevel { get; set; } = false;
+
         #endregion
 
         #region Event Handler Methods
@@ -141,7 +162,6 @@ namespace WindowFinder
                     cursorTarget = Cursors.Cross;
             }
 
-
             // Set default values
             picTarget.Image = bitmapFind;
         }
@@ -166,7 +186,15 @@ namespace WindowFinder
 
             // Show info
             SetWindowHandle(picTarget.Handle);
+
+            _wasCtrlKeyDown = false;
+            _timerCheckKey.Start();
         }
+
+        private Timer _timerCheckKey = null;
+        private bool _wasCtrlKeyDown = false;
+        private int _mousex = -1;
+        private int _mousey = -1;
 
         /// <summary>
         /// Handles the MouseMove event of the picTarget control.
@@ -179,52 +207,10 @@ namespace WindowFinder
             if(!isTargeting)
                 return;
 
-            System.Drawing.Point pt = new Point(e.X, e.Y);
+            _mousex = e.X;
+            _mousey = e.Y;
 
-            Win32.ClientToScreen(picTarget.Handle, ref pt);
-
-            // Get screen coords from client coords and window handle
-            IntPtr hChild1 = Win32.WindowFromPoint(IntPtr.Zero, pt.X, pt.Y);
-            // -- We name it "child" bcz it must be a child-or-grand-child of the Desktop window.
-
-            // Get real window
-            if (hChild1 != IntPtr.Zero)
-            {
-                // MSDN undoc: 
-                // Case 1: Under normal situation, WindowFromPoint() gives us most visible child-window HWND.
-                // Case 2: If top-level window X brings up a modal dialog(About box etc), then a child window
-                //         of X will not be reported by WindowFromPoint() but X is reported instead.
-                // To cope with Case 2, we have to call ChildWindowFromPointEx() recursively until we find
-                // the most visible window.
-
-                IntPtr hParent = IntPtr.Zero;
-
-                while(true)
-                {
-                    Win32.MapWindowPoints(hParent, hChild1, ref pt, 1);
-
-                    IntPtr hChild2 = (IntPtr)Win32.ChildWindowFromPointEx(hChild1, pt,
-                        Win32.ChildWindowFromPointFlags.CWP_SKIPINVISIBLE);
-
-                    if(hChild2 == IntPtr.Zero)
-                        break;
-                    if(hChild1 == hChild2)
-                        break;
-
-                    hParent = hChild1;
-                    hChild1 = hChild2;
-                }
-            }
-
-            // Get owner // todo: Make this an option
-//            while((hTemp = Win32.GetParent(hWnd)) != IntPtr.Zero)
-//                hWnd = hTemp;
-
-            // Show info
-            SetWindowHandle(hChild1);
-
-            // Highlight valid window
-            HighlightValidWindow(hChild1, this.Handle);
+            RetargetMyHwnd();
         }
 
         /// <summary>
@@ -251,6 +237,79 @@ namespace WindowFinder
 
             // Release capture
             Win32.SetCapture(IntPtr.Zero);
+
+            _timerCheckKey.Stop();
+        }
+
+        private void RetargetMyHwnd()
+        {
+            System.Drawing.Point pt = new Point(_mousex, _mousey);
+
+            Win32.ClientToScreen(picTarget.Handle, ref pt);
+
+            // Get screen coords from client coords and window handle
+            IntPtr hChild1 = Win32.WindowFromPoint(IntPtr.Zero, pt.X, pt.Y);
+            // -- We name it "child" bcz it must be a child-or-grand-child of the Desktop window.
+
+            // Get real window
+            if (hChild1 != IntPtr.Zero)
+            {
+                // MSDN undoc: 
+                // Case 1: Under normal situation, WindowFromPoint() gives us most visible child-window HWND.
+                // Case 2: If top-level window X brings up a modal dialog(About box etc), then a child window
+                //         of X will not be reported by WindowFromPoint() but X is reported instead.
+                // To cope with Case 2, we have to call ChildWindowFromPointEx() recursively until we find
+                // the most visible window.
+
+                IntPtr hParent = IntPtr.Zero;
+
+                while (true)
+                {
+                    Win32.MapWindowPoints(hParent, hChild1, ref pt, 1);
+
+                    IntPtr hChild2 = (IntPtr)Win32.ChildWindowFromPointEx(hChild1, pt,
+                        Win32.ChildWindowFromPointFlags.CWP_SKIPINVISIBLE);
+
+                    if (hChild2 == IntPtr.Zero)
+                        break;
+                    if (hChild1 == hChild2)
+                        break;
+
+                    hParent = hChild1;
+                    hChild1 = hChild2;
+                }
+            }
+
+            if (isFindOnlyTopLevel || _wasCtrlKeyDown)
+            {
+                hChild1 = Win32.GetAncestor(hChild1, Win32.GetAncestorFlags.GetRoot);
+            }
+
+            // Show info
+            SetWindowHandle(hChild1);
+
+            // Highlight valid window
+            HighlightValidWindow(hChild1, this.Handle);
+        }
+
+        private void picTarget_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            // Chj: This cannot be triggered! Why?
+
+            Debug.WriteLine($"picTarget_KeyDown({e.KeyCode})...");
+            if (e.KeyCode == Keys.Control)
+            {
+                RetargetMyHwnd();
+            }
+        }
+
+        private void picTarget_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            Debug.WriteLine($"picTarget_KeyUp({e.KeyCode})...");
+            if (e.KeyCode == Keys.Control)
+            {
+                RetargetMyHwnd();
+            }
         }
 
         #endregion

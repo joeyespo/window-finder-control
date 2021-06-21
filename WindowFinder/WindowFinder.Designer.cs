@@ -36,6 +36,8 @@ namespace WindowFinder
             this.picTarget.MouseUp += new System.Windows.Forms.MouseEventHandler(this.picTarget_MouseUp);
             this.picTarget.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picTarget_MouseMove);
             this.picTarget.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picTarget_MouseDown);
+            this.picTarget.KeyDown += picTarget_KeyDown;
+            this.picTarget.KeyUp += picTarget_KeyUp;
             // 
             // WindowFinder
             // 
