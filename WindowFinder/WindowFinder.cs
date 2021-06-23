@@ -226,9 +226,7 @@ namespace WindowFinder
             // Unhighlight window
             if (targetWindow != IntPtr.Zero)
             {
-                Win32.HighlightWindow(targetWindow);
-
-                targetWindow = IntPtr.Zero;
+                ToggleWindowHighlight(targetWindow);
             }
 
             // Reset capture image and cursor
@@ -352,7 +350,9 @@ namespace WindowFinder
         #region Helper Methods
 
         /// <summary>
-        /// Highlights the specified window, but only if it is a valid window in relation to the specified owner window.
+        /// Highlights the specified window, but only if
+        ///  ..... it is a valid window in relation to the specified owner window. TODO: comment fix
+        /// Previous highlight(of an old window) is turned off at the same time.
         /// </summary>
         private void HighlightValidWindow(IntPtr hWnd, IntPtr hOwner)
         {
@@ -366,21 +366,39 @@ namespace WindowFinder
                 // Unhighlight last window
                 if(targetWindow != IntPtr.Zero)
                 {
-                    Win32.HighlightWindow(targetWindow);
-                    targetWindow = IntPtr.Zero;
+                    ToggleWindowHighlight(targetWindow);
                 }
 
                 return;
             }
 
-            // Unhighlight last window
-            Win32.HighlightWindow(targetWindow);
+            // Unhighlight previous window
+            ToggleWindowHighlight(targetWindow);
 
-            // Set as current target
-            targetWindow = hWnd;
+            // Highlight new window
+            ToggleWindowHighlight(hWnd);
+        }
 
-            // Highlight window
-            Win32.HighlightWindow(hWnd);
+        /// <summary>
+        /// If hWnd is highlight-on, turn it off;
+        /// If hWnd is highlight-off, turn it on.
+        ///
+        /// Implicit input/output: this.targetWindow
+        /// </summary>
+        /// <param name="hWnd">the HWND to toggle</param>
+        private void ToggleWindowHighlight(IntPtr hWnd)
+        {
+            if (hWnd == IntPtr.Zero)
+                return;
+
+            Debug.Assert(targetWindow==IntPtr.Zero || targetWindow==hWnd);
+
+            Win32.HighlightWindow_InvertColor(hWnd);
+
+            if (targetWindow == IntPtr.Zero)
+                targetWindow = hWnd; // highlight ON
+            else
+                targetWindow = IntPtr.Zero; // highlight OFF
         }
 
         #endregion

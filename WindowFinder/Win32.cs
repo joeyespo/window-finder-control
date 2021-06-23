@@ -151,7 +151,7 @@ namespace WindowFinder
         /// <summary>
         /// Highlights the specified window.
         /// </summary>
-        internal static bool HighlightWindow(IntPtr hWnd)
+        internal static bool HighlightWindow_InvertColor(IntPtr hWnd)
         {
             if (hWnd == IntPtr.Zero)
                 return true;
