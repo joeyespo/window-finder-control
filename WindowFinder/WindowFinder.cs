@@ -402,10 +402,11 @@ namespace WindowFinder
         }
 
         /// <summary>
-        /// If hWnd is highlight-on, turn it off;
-        /// If hWnd is highlight-off, turn it on.
+        /// If hWnd was highlight-on, turn it off;
+        /// If hWnd was highlight-off, turn it on.
         ///
         /// Implicit input/output: this.targetWindow
+        /// 
         /// </summary>
         /// <param name="hWnd">the HWND to toggle</param>
         private void ToggleWindowHighlight(IntPtr hWnd)

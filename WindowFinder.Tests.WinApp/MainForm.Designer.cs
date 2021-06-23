@@ -27,6 +27,7 @@ namespace TestControl
         private void InitializeComponent()
         {
             this.gpbTrayMe = new System.Windows.Forms.GroupBox();
+            this.windowFinder = new WindowFinder.WindowFinder();
             this.lblWindowHandle = new System.Windows.Forms.Label();
             this.txtWindowHandle = new System.Windows.Forms.TextBox();
             this.lblWindowText = new System.Windows.Forms.Label();
@@ -37,8 +38,11 @@ namespace TestControl
             this.txtWindowClass = new System.Windows.Forms.TextBox();
             this.lblWindowClass = new System.Windows.Forms.Label();
             this.btnClose = new System.Windows.Forms.Button();
-            this.windowFinder = new WindowFinder.WindowFinder();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.radiobtnInvertColor = new System.Windows.Forms.RadioButton();
+            this.radiobtnAimingFrame = new System.Windows.Forms.RadioButton();
             this.gpbTrayMe.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // gpbTrayMe
@@ -59,6 +63,16 @@ namespace TestControl
             this.gpbTrayMe.Size = new System.Drawing.Size(260, 184);
             this.gpbTrayMe.TabIndex = 0;
             this.gpbTrayMe.TabStop = false;
+            // 
+            // windowFinder
+            // 
+            this.windowFinder.isFindOnlyTopLevel = false;
+            this.windowFinder.Location = new System.Drawing.Point(108, 32);
+            this.windowFinder.Name = "windowFinder";
+            this.windowFinder.Size = new System.Drawing.Size(31, 28);
+            this.windowFinder.TabIndex = 1;
+            this.windowFinder.tgwHighlightMethod = WindowFinder.WindowFinder.HighlightMethod.AimingFrame;
+            this.windowFinder.WindowHandleChanged += new System.EventHandler(this.windowFinder_WindowHandleChanged);
             // 
             // lblWindowHandle
             // 
@@ -143,20 +157,45 @@ namespace TestControl
             this.btnClose.Text = "Cl&ose";
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // windowFinder
+            // groupBox1
             // 
-            this.windowFinder.isFindOnlyTopLevel = false;
-            this.windowFinder.Location = new System.Drawing.Point(108, 32);
-            this.windowFinder.Name = "windowFinder";
-            this.windowFinder.Size = new System.Drawing.Size(31, 28);
-            this.windowFinder.TabIndex = 1;
-            this.windowFinder.WindowHandleChanged += new System.EventHandler(this.windowFinder_WindowHandleChanged);
+            this.groupBox1.Controls.Add(this.radiobtnAimingFrame);
+            this.groupBox1.Controls.Add(this.radiobtnInvertColor);
+            this.groupBox1.Location = new System.Drawing.Point(280, 122);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(92, 70);
+            this.groupBox1.TabIndex = 2;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Highlight by";
+            // 
+            // radiobtnInvertColor
+            // 
+            this.radiobtnInvertColor.AutoSize = true;
+            this.radiobtnInvertColor.Location = new System.Drawing.Point(5, 22);
+            this.radiobtnInvertColor.Name = "radiobtnInvertColor";
+            this.radiobtnInvertColor.Size = new System.Drawing.Size(78, 17);
+            this.radiobtnInvertColor.TabIndex = 8;
+            this.radiobtnInvertColor.TabStop = true;
+            this.radiobtnInvertColor.Text = "&Invert color";
+            this.radiobtnInvertColor.UseVisualStyleBackColor = true;
+            this.radiobtnInvertColor.CheckedChanged += new System.EventHandler(this.radiobtnInvertColor_CheckedChanged);
+            // 
+            // radiobtnAimingFrame
+            // 
+            this.radiobtnAimingFrame.AutoSize = true;
+            this.radiobtnAimingFrame.Location = new System.Drawing.Point(5, 41);
+            this.radiobtnAimingFrame.Name = "radiobtnAimingFrame";
+            this.radiobtnAimingFrame.Size = new System.Drawing.Size(85, 17);
+            this.radiobtnAimingFrame.TabIndex = 9;
+            this.radiobtnAimingFrame.Text = "&Aiming frame";
+            this.radiobtnAimingFrame.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.btnClose;
             this.ClientSize = new System.Drawing.Size(380, 202);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.gpbTrayMe);
             this.Name = "MainForm";
@@ -164,6 +203,8 @@ namespace TestControl
             this.Text = "Test WindowFinder Control";
             this.gpbTrayMe.ResumeLayout(false);
             this.gpbTrayMe.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -186,5 +227,8 @@ namespace TestControl
         private System.Windows.Forms.TextBox txtWindowClass;
         private System.Windows.Forms.Label lblWindowClass;
         private WindowFinder.WindowFinder windowFinder;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton radiobtnAimingFrame;
+        private System.Windows.Forms.RadioButton radiobtnInvertColor;
     }
 }

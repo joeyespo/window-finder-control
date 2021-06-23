@@ -18,6 +18,8 @@ namespace TestControl
         public MainForm()
         {
             InitializeComponent();
+
+            this.radiobtnAimingFrame.Checked = true;
         }
 
         #region Event Handler Methods
@@ -78,5 +80,12 @@ namespace TestControl
         #endregion
 
         private bool windowHandleChanging = false;
+
+        private void radiobtnInvertColor_CheckedChanged(object sender, EventArgs e)
+        {
+            this.windowFinder.tgwHighlightMethod = radiobtnInvertColor.Checked
+                ? WindowFinder.WindowFinder.HighlightMethod.InvertColor
+                : WindowFinder.WindowFinder.HighlightMethod.AimingFrame;
+        }
     }
 }
