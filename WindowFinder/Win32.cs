@@ -182,7 +182,8 @@ namespace WindowFinder
                     // Target HWND is Per-monitor mode, so we switch our thread to Per-monitor mode as well,
                     // so that GetWindowRect() and FrameRgn() all operates in physical(=pixel) coordinate.
 
-                    thread_oldctx = DpiUtilities.SetThreadDpiAwarenessContext(DpiUtilities.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+                    thread_oldctx =
+                        DpiUtilities.SetThreadDpiAwarenessContext(DpiUtilities.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
                 }
                 else
                 {
@@ -193,10 +194,11 @@ namespace WindowFinder
                     // Finally, we call FrameRgn() with scaled-up width-and-height bcz the coordinates
                     // to FrameRgn() is in target-HWND's perspective, not in our thread's perspective.
 
-                    thread_oldctx = DpiUtilities.SetThreadDpiAwarenessContext(DpiUtilities.DPI_AWARENESS_CONTEXT_UNAWARE);
+                    thread_oldctx =
+                        DpiUtilities.SetThreadDpiAwarenessContext(DpiUtilities.DPI_AWARENESS_CONTEXT_UNAWARE);
                     target_hwnd_dpi = DpiUtilities.GetDpiForWindow(hWnd);
 
-                    scale_factor = (float)target_hwnd_dpi / 96;
+                    scale_factor = (float) target_hwnd_dpi / 96;
                 }
             }
 
@@ -208,8 +210,8 @@ namespace WindowFinder
             rt.bottom -= rt.top;
             rt.top = 0;
 
-            rt.right = (int)(rt.right * scale_factor);
-            rt.bottom = (int)(rt.bottom * scale_factor);
+            rt.right = (int) (rt.right * scale_factor);
+            rt.bottom = (int) (rt.bottom * scale_factor);
 
             // Draw a border in the DC covering the entire window area of the window.
             IntPtr hRgn = (IntPtr) CreateRectRgnIndirect(ref rt);
@@ -228,6 +230,34 @@ namespace WindowFinder
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Highlight target window(hWnd) by overlaying it with an same-size window(hwndOverlay).
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <param name="hwndOverlay"></param>
+        internal static void HighlightWindow_Overlaying(IntPtr hWnd, IntPtr hwndOverlay)
+        {
+            IntPtr thread_oldctx = IntPtr.Zero;
+
+            if (IsAboveWin10_1607())
+            {
+                thread_oldctx =
+                    DpiUtilities.SetThreadDpiAwarenessContext(DpiUtilities.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+            }
+
+            RECT rt = new RECT();
+            GetWindowRect(hWnd, out rt);
+
+            Win32.SetWindowPos(hwndOverlay, Win32.HWND_TOPMOST,
+                rt.left, rt.top, (rt.right - rt.left), (rt.bottom - rt.top)
+            );
+
+            if (IsAboveWin10_1607())
+            {
+                DpiUtilities.SetThreadDpiAwarenessContext(thread_oldctx);
+            }
         }
 
         /// <summary>
@@ -328,6 +358,7 @@ namespace WindowFinder
 
         [DllImport("user32.dll", ExactSpelling = true)]
         public static extern IntPtr GetAncestor(IntPtr hwnd, GetAncestorFlags flags);
+
         //
         public enum GetAncestorFlags
         {
@@ -335,10 +366,12 @@ namespace WindowFinder
             /// Retrieves the parent window. This does not include the owner, as it does with the GetParent function.
             /// </summary>
             GetParent = 1,
+
             /// <summary>
             /// Retrieves the root window by walking the chain of parent windows.
             /// </summary>
             GetRoot = 2,
+
             /// <summary>
             /// Retrieves the owned root window by walking the chain of parent and owner windows returned by GetParent.
             /// </summary>
@@ -461,6 +494,20 @@ namespace WindowFinder
             /// Horizontal width of entire desktop in pixels
             /// </summary>
             DESKTOPHORZRES = 118,
+        }
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy,
+            SetWindowPosFlags uFlags = 0);
+        //
+        static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
+        static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
+        static readonly IntPtr HWND_TOP = new IntPtr(0);
+        static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
+        //
+        [Flags]
+        public enum SetWindowPosFlags : uint
+        {
         }
     }
 

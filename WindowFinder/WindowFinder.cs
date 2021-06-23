@@ -31,6 +31,8 @@ namespace WindowFinder
             picTarget.Size = new Size(31, 28);
             Size = picTarget.Size;
 
+            _aimframe = new AimingFrame();
+
             _timerCheckKey = new Timer();
             _timerCheckKey.Interval = 100;
             _timerCheckKey.Tick += new EventHandler(TimerCheckKey);
@@ -131,6 +133,26 @@ namespace WindowFinder
         /// </summary>
         [Browsable(true)]
         public bool isFindOnlyTopLevel { get; set; } = false;
+
+        public enum HighlightMethod
+        {
+            InvertColor = 0,
+            AimingFrame = 1,
+        }
+
+        /// <summary>
+        /// Select from one of two window-highlighting method.
+        /// InvertColor is the traditional one, which loses visual effect on Win7+ DWM top-level window.
+        /// AimingFrame uses a layered window(since Win2000) to demarcate a window's border, always works.
+        /// </summary>
+        [Browsable(true)]
+        public HighlightMethod tgwHighlightMethod { get; set; } = HighlightMethod.AimingFrame;
+
+        /// <summary>
+        /// This refers to a special layered-window that is visually a red frame.
+        /// This red frame will tell human user which window he is currently aiming.
+        /// </summary>
+        private AimingFrame _aimframe;
 
         #endregion
 
@@ -393,13 +415,30 @@ namespace WindowFinder
 
             Debug.Assert(targetWindow==IntPtr.Zero || targetWindow==hWnd);
 
-            Win32.HighlightWindow_InvertColor(hWnd);
+            if (tgwHighlightMethod == HighlightMethod.InvertColor)
+            {
+                Win32.HighlightWindow_InvertColor(hWnd);
+            }
+            else
+            {
+                if (targetWindow == IntPtr.Zero)
+                {
+                    _aimframe.Show(); // highlight on for new window
+                    Win32.HighlightWindow_Overlaying(hWnd, _aimframe.Handle);
+                }
+                else
+                {
+                    _aimframe.Hide(); // highlight off for old window
+                }
+            }
 
             if (targetWindow == IntPtr.Zero)
                 targetWindow = hWnd; // highlight ON
             else
                 targetWindow = IntPtr.Zero; // highlight OFF
         }
+
+
 
         #endregion
 
