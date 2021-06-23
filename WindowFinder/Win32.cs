@@ -3,6 +3,7 @@
 // [2021-06-21] Updated by Jimm Chen, now works with Win1.1607 mixed-mode DPI scaling.
 
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
@@ -250,13 +251,33 @@ namespace WindowFinder
             RECT rt = new RECT();
             GetWindowRect(hWnd, out rt);
 
-            Win32.SetWindowPos(hwndOverlay, Win32.HWND_TOPMOST,
+            IntPtr hwndToplevel = Win32.GetAncestor(hWnd, Win32.GetAncestorFlags.GetRoot);
+
+            Win32.SetWindowPos(hwndOverlay, Win32.HWND_TOP,
                 rt.left, rt.top, (rt.right - rt.left), (rt.bottom - rt.top)
             );
 
+            //
+            // Now we also want to place the aiming-window JUST ABOVE the target hWnd (z-order),
+            // not blindly make it TOP at z-order.
+            //
+
+            IntPtr hwndHigher = Win32.GetWindow(hwndToplevel, Win32.GetWindowType.GW_HWNDPREV);
+            if (hwndHigher == IntPtr.Zero)
+            {
+                // hWnd is the highest at z-order, so hwndOverlay has been at top(HWND_TOP code above).
+                // So do nothing here.
+            }
+            else
+            {
+                Win32.SetWindowPos(hwndOverlay, hwndHigher, 0, 0, 0, 0,
+                    Win32.SetWindowPosFlags.NOMOVE | Win32.SetWindowPosFlags.NOSIZE);
+                //Debug.WriteLine($"### {(uint)hwndHigher:X8} -> {(uint)hwndOverlay:X8} -> {(uint)hwndToplevel:X8}");
+            }
+
             if (IsAboveWin10_1607())
             {
-                DpiUtilities.SetThreadDpiAwarenessContext(thread_oldctx);
+                DpiUtilities.SetThreadDpiAwarenessContext(thread_oldctx); // restore ctx
             }
         }
 
@@ -508,6 +529,38 @@ namespace WindowFinder
         [Flags]
         public enum SetWindowPosFlags : uint
         {
+            NOSIZE = 0x0001,
+            NOMOVE = 0x0002,
+            NOZORDER = 0x0004,
+            NOREDRAW = 0x0008,
+            NOACTIVATE = 0x0010,
+            DRAWFRAME = 0x0020,
+            FRAMECHANGED = 0x0020,
+            SHOWWINDOW = 0x0040,
+            HIDEWINDOW = 0x0080,
+            NOCOPYBITS = 0x0100,
+            NOOWNERZORDER = 0x0200,
+            NOREPOSITION = 0x0200,
+            NOSENDCHANGING = 0x0400,
+            DEFERERASE = 0x2000,
+            ASYNCWINDOWPOS = 0x4000,
+        }
+
+        /// <summary>
+        /// Retrieves a handle to a window that has the specified relationship (Z-Order or owner) to the specified window.
+        /// </summary>
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr GetWindow(IntPtr hWnd, GetWindowType uCmd);
+        //
+        public enum GetWindowType : uint
+        {
+            GW_HWNDFIRST = 0,
+            GW_HWNDLAST = 1,
+            GW_HWNDNEXT = 2,
+            GW_HWNDPREV = 3,
+            GW_OWNER = 4,
+            GW_CHILD = 5,
+            GW_ENABLEDPOPUP = 6
         }
     }
 
@@ -537,7 +590,6 @@ namespace WindowFinder
             DPI_AWARENESS_SYSTEM_AWARE = 1,
             DPI_AWARENESS_PER_MONITOR_AWARE = 2
         }
-
 
         [DllImport("user32.dll")]
         public static extern int GetDpiForWindow(IntPtr hwnd); // Win10.1607
