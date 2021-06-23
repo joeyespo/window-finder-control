@@ -240,6 +240,15 @@ namespace WindowFinder
         /// <param name="hwndOverlay"></param>
         internal static void HighlightWindow_Overlaying(IntPtr hWnd, IntPtr hwndOverlay)
         {
+
+            // test>>>
+            IntPtr hdc = GetDC(hWnd);
+            int sx = GetDeviceCaps(hdc, 88); // LOGPIXELSX
+            Debug.WriteLine($"### {(uint)hWnd:X8} LOGPIXELSX = {sx}");
+            ReleaseDC(hWnd, hdc);
+            // test<<<
+
+
             IntPtr thread_oldctx = IntPtr.Zero;
 
             if (IsAboveWin10_1607())
@@ -250,6 +259,8 @@ namespace WindowFinder
 
             RECT rt = new RECT();
             GetWindowRect(hWnd, out rt);
+
+Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left},{rt.bottom-rt.top})");
 
             IntPtr hwndToplevel = Win32.GetAncestor(hWnd, Win32.GetAncestorFlags.GetRoot);
 
@@ -562,6 +573,9 @@ namespace WindowFinder
             GW_CHILD = 5,
             GW_ENABLEDPOPUP = 6
         }
+
+        [DllImport("gdi32.dll")]
+        static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
     }
 
     public static class DpiUtilities
