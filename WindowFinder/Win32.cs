@@ -5,7 +5,10 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Xml;
 
 
 namespace WindowFinder
@@ -240,15 +243,6 @@ namespace WindowFinder
         /// <param name="hwndOverlay"></param>
         internal static void HighlightWindow_Overlaying(IntPtr hWnd, IntPtr hwndOverlay)
         {
-
-            // test>>>
-            IntPtr hdc = GetDC(hWnd);
-            int sx = GetDeviceCaps(hdc, 88); // LOGPIXELSX
-            Debug.WriteLine($"### {(uint)hWnd:X8} LOGPIXELSX = {sx}");
-            ReleaseDC(hWnd, hdc);
-            // test<<<
-
-
             IntPtr thread_oldctx = IntPtr.Zero;
 
             if (IsAboveWin10_1607())
@@ -576,17 +570,30 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
 
         [DllImport("gdi32.dll")]
         static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
     }
 
     public static class DpiUtilities
     {
+        /// <summary>
+        /// Win10.1607+ Set-ThreadDpiAwarenessContext
+        /// </summary>
+        /// <param name="DpiAwarenessContext">Calling thread wants to use this DPI-awareness-context.</param>
+        /// <returns></returns>
         [DllImport("user32.dll")]
         public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr DpiAwarenessContext); // Win10.1607
         // -- return old DPI_AWARENESS_CONTEXT enum for this thread
 
+        /// <summary>
+        /// Win10.1607+ Get-WindowDpiAwarenessContext.
+        /// Return DPI_AWARENESS_CONTEXT id(abstract) for this hwnd
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <returns></returns>
         [DllImport("user32.dll")]
         public static extern IntPtr GetWindowDpiAwarenessContext(IntPtr hwnd);
-        // -- return DPI_AWARENESS_CONTEXT enum for this hwnd
 
         // DPI_AWARENESS_CONTEXT enum values:
         public static IntPtr DPI_AWARENESS_CONTEXT_UNAWARE = (IntPtr)(-1);
@@ -594,6 +601,11 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
         public static IntPtr DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE = (IntPtr)(-3); // we only use this here
         public static IntPtr DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = (IntPtr)(-4);
 
+        /// <summary>
+        /// Win10.1607+ Convert fine-grained DPI-awareness-context value to coarse-grained DPI-awareness enum.
+        /// </summary>
+        /// <param name="dpi_awareness_context"></param>
+        /// <returns></returns>
         [DllImport("user32.dll")]
         public static extern DPI_AWARENESS GetAwarenessFromDpiAwarenessContext(IntPtr dpi_awareness_context);
         //
@@ -610,6 +622,39 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
 
         [DllImport("user32.dll")]
         public static extern int GetDpiForSystem(); // Win10.1607
+
+        /// <summary>
+        /// Win81 GetProcessDpiAwareness. Use it to know our own process DPI-awareness.
+        /// </summary>
+        /// <param name="hprocess">Process Handle.</param>
+        /// <param name="value">Receive output.</param>
+        /// <returns>HRESULT.</returns>
+        [DllImport("Shcore.dll")]
+        public static extern int GetProcessDpiAwareness(IntPtr hprocess, out PROCESS_DPI_AWARENESS value);
+        //
+        public enum PROCESS_DPI_AWARENESS : int
+        {
+            PROCESS_DPI_UNAWARE = 0,
+            PROCESS_SYSTEM_DPI_AWARE = 1,
+            PROCESS_PER_MONITOR_DPI_AWARE = 2,
+
+            PROCESS_DPI_Unset = -4,
+        };
+
+        /// <summary>
+        /// Win7 IsProcessDPIAware.
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll")]
+        public static extern bool IsProcessDPIAware();
+
+        /// <summary>
+        /// Win7 SetProcessDPIAware.
+        /// </summary>
+        /// <returns>Whether set success.</returns>
+        [DllImport("user32.dll")]
+        public static extern bool SetProcessDPIAware();
 
     }
 }
