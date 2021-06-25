@@ -48,6 +48,12 @@ namespace TestControl
             txtWindowClass.Text = windowFinder.WindowClass;
             txtWindowText.Text = windowFinder.WindowText;
             txtWindowCharset.Text = windowFinder.WindowCharset;
+
+            Rectangle rt = windowFinder.WindowRect;
+            if (rt == Rectangle.Empty)
+                txtWindowRect.Text = "";
+            else
+                txtWindowRect.Text = $"[{rt.Width} x {rt.Height}] LT({rt.Left}, {rt.Top}) RB({rt.Right}, {rt.Bottom})";
         }
 
         /// <summary>

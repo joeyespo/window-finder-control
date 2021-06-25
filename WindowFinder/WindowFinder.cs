@@ -128,6 +128,11 @@ namespace WindowFinder
             }
         }
 
+        public Rectangle WindowRect
+        {
+            get { return _tgWinRect;  }
+        }
+
         /// <summary>
         /// If true, only top-level window can be highlighted.
         /// </summary>
@@ -351,6 +356,7 @@ namespace WindowFinder
                 windowText = string.Empty;
                 isWindowUnicode = false;
                 windowCharset = string.Empty;
+                _tgWinRect = Rectangle.Empty;
             }
             else
             {
@@ -361,6 +367,10 @@ namespace WindowFinder
                 windowText = Win32.GetWindowText(handle);
                 isWindowUnicode = Win32.IsWindowUnicode(handle) != 0;
                 windowCharset = ((isWindowUnicode) ? ("Unicode") : ("Ansi"));
+
+                Win32.RECT rt = new Win32.RECT();
+                Win32.GetWindowRect(handle, out rt);
+                _tgWinRect = new Rectangle(rt.left, rt.top, rt.right-rt.left, rt.bottom-rt.top);
             }
 
             if(WindowHandleChanged != null)
@@ -454,5 +464,6 @@ namespace WindowFinder
         private string windowText = string.Empty;
         private bool isWindowUnicode = false;
         private string windowCharset = string.Empty;
+        private Rectangle _tgWinRect = Rectangle.Empty;
     }
 }

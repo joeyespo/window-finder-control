@@ -40,14 +40,18 @@ namespace TestControl
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.radiobtnAimingFrame = new System.Windows.Forms.RadioButton();
             this.radiobtnInvertColor = new System.Windows.Forms.RadioButton();
-            this.windowFinder = new WindowFinder.WindowFinder();
             this.lblDpiAwareness = new System.Windows.Forms.Label();
+            this.lblWinRect = new System.Windows.Forms.Label();
+            this.txtWindowRect = new System.Windows.Forms.TextBox();
+            this.windowFinder = new WindowFinder.WindowFinder();
             this.gpbTrayMe.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // gpbTrayMe
             // 
+            this.gpbTrayMe.Controls.Add(this.txtWindowRect);
+            this.gpbTrayMe.Controls.Add(this.lblWinRect);
             this.gpbTrayMe.Controls.Add(this.windowFinder);
             this.gpbTrayMe.Controls.Add(this.lblWindowHandle);
             this.gpbTrayMe.Controls.Add(this.txtWindowHandle);
@@ -61,7 +65,7 @@ namespace TestControl
             this.gpbTrayMe.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.gpbTrayMe.Location = new System.Drawing.Point(8, 28);
             this.gpbTrayMe.Name = "gpbTrayMe";
-            this.gpbTrayMe.Size = new System.Drawing.Size(260, 164);
+            this.gpbTrayMe.Size = new System.Drawing.Size(260, 172);
             this.gpbTrayMe.TabIndex = 0;
             this.gpbTrayMe.TabStop = false;
             // 
@@ -84,7 +88,7 @@ namespace TestControl
             // 
             // lblWindowText
             // 
-            this.lblWindowText.Location = new System.Drawing.Point(16, 108);
+            this.lblWindowText.Location = new System.Drawing.Point(16, 104);
             this.lblWindowText.Name = "lblWindowText";
             this.lblWindowText.Size = new System.Drawing.Size(48, 16);
             this.lblWindowText.TabIndex = 6;
@@ -92,7 +96,7 @@ namespace TestControl
             // 
             // txtWindowText
             // 
-            this.txtWindowText.Location = new System.Drawing.Point(68, 104);
+            this.txtWindowText.Location = new System.Drawing.Point(68, 100);
             this.txtWindowText.Name = "txtWindowText";
             this.txtWindowText.ReadOnly = true;
             this.txtWindowText.Size = new System.Drawing.Size(176, 20);
@@ -100,7 +104,7 @@ namespace TestControl
             // 
             // lblWindowCharset
             // 
-            this.lblWindowCharset.Location = new System.Drawing.Point(16, 132);
+            this.lblWindowCharset.Location = new System.Drawing.Point(16, 126);
             this.lblWindowCharset.Name = "lblWindowCharset";
             this.lblWindowCharset.Size = new System.Drawing.Size(48, 16);
             this.lblWindowCharset.TabIndex = 8;
@@ -108,7 +112,7 @@ namespace TestControl
             // 
             // txtWindowCharset
             // 
-            this.txtWindowCharset.Location = new System.Drawing.Point(68, 128);
+            this.txtWindowCharset.Location = new System.Drawing.Point(68, 122);
             this.txtWindowCharset.Name = "txtWindowCharset";
             this.txtWindowCharset.ReadOnly = true;
             this.txtWindowCharset.Size = new System.Drawing.Size(176, 20);
@@ -124,7 +128,7 @@ namespace TestControl
             // 
             // txtWindowClass
             // 
-            this.txtWindowClass.Location = new System.Drawing.Point(68, 80);
+            this.txtWindowClass.Location = new System.Drawing.Point(68, 78);
             this.txtWindowClass.Name = "txtWindowClass";
             this.txtWindowClass.ReadOnly = true;
             this.txtWindowClass.Size = new System.Drawing.Size(176, 20);
@@ -132,7 +136,7 @@ namespace TestControl
             // 
             // lblWindowClass
             // 
-            this.lblWindowClass.Location = new System.Drawing.Point(16, 84);
+            this.lblWindowClass.Location = new System.Drawing.Point(16, 82);
             this.lblWindowClass.Name = "lblWindowClass";
             this.lblWindowClass.Size = new System.Drawing.Size(48, 16);
             this.lblWindowClass.TabIndex = 4;
@@ -152,7 +156,7 @@ namespace TestControl
             // 
             this.groupBox1.Controls.Add(this.radiobtnAimingFrame);
             this.groupBox1.Controls.Add(this.radiobtnInvertColor);
-            this.groupBox1.Location = new System.Drawing.Point(280, 122);
+            this.groupBox1.Location = new System.Drawing.Point(280, 130);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(92, 70);
             this.groupBox1.TabIndex = 2;
@@ -181,6 +185,32 @@ namespace TestControl
             this.radiobtnInvertColor.UseVisualStyleBackColor = true;
             this.radiobtnInvertColor.CheckedChanged += new System.EventHandler(this.radiobtnInvertColor_CheckedChanged);
             // 
+            // lblDpiAwareness
+            // 
+            this.lblDpiAwareness.AutoSize = true;
+            this.lblDpiAwareness.Location = new System.Drawing.Point(12, 12);
+            this.lblDpiAwareness.Name = "lblDpiAwareness";
+            this.lblDpiAwareness.Size = new System.Drawing.Size(85, 13);
+            this.lblDpiAwareness.TabIndex = 10;
+            this.lblDpiAwareness.Text = "?DPI awareness";
+            // 
+            // lblWinRect
+            // 
+            this.lblWinRect.AutoSize = true;
+            this.lblWinRect.Location = new System.Drawing.Point(16, 148);
+            this.lblWinRect.Name = "lblWinRect";
+            this.lblWinRect.Size = new System.Drawing.Size(52, 13);
+            this.lblWinRect.TabIndex = 10;
+            this.lblWinRect.Text = "WinRect:";
+            // 
+            // txtWindowRect
+            // 
+            this.txtWindowRect.Location = new System.Drawing.Point(68, 144);
+            this.txtWindowRect.Name = "txtWindowRect";
+            this.txtWindowRect.ReadOnly = true;
+            this.txtWindowRect.Size = new System.Drawing.Size(176, 20);
+            this.txtWindowRect.TabIndex = 11;
+            // 
             // windowFinder
             // 
             this.windowFinder.isFindOnlyTopLevel = false;
@@ -191,20 +221,11 @@ namespace TestControl
             this.windowFinder.tgwHighlightMethod = WindowFinder.WindowFinder.HighlightMethod.AimingFrame;
             this.windowFinder.WindowHandleChanged += new System.EventHandler(this.windowFinder_WindowHandleChanged);
             // 
-            // lblDpiAwareness
-            // 
-            this.lblDpiAwareness.AutoSize = true;
-            this.lblDpiAwareness.Location = new System.Drawing.Point(12, 12);
-            this.lblDpiAwareness.Name = "lblDpiAwareness";
-            this.lblDpiAwareness.Size = new System.Drawing.Size(85, 13);
-            this.lblDpiAwareness.TabIndex = 10;
-            this.lblDpiAwareness.Text = "?DPI awareness";
-            // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.btnClose;
-            this.ClientSize = new System.Drawing.Size(380, 202);
+            this.ClientSize = new System.Drawing.Size(380, 207);
             this.Controls.Add(this.lblDpiAwareness);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnClose);
@@ -244,5 +265,7 @@ namespace TestControl
         private System.Windows.Forms.RadioButton radiobtnAimingFrame;
         private System.Windows.Forms.RadioButton radiobtnInvertColor;
         private System.Windows.Forms.Label lblDpiAwareness;
+        private System.Windows.Forms.TextBox txtWindowRect;
+        private System.Windows.Forms.Label lblWinRect;
     }
 }
