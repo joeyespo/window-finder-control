@@ -71,7 +71,7 @@ namespace TestControl
             // 
             // lblWindowHandle
             // 
-            this.lblWindowHandle.Location = new System.Drawing.Point(16, 60);
+            this.lblWindowHandle.Location = new System.Drawing.Point(8, 60);
             this.lblWindowHandle.Name = "lblWindowHandle";
             this.lblWindowHandle.Size = new System.Drawing.Size(48, 16);
             this.lblWindowHandle.TabIndex = 2;
@@ -79,7 +79,7 @@ namespace TestControl
             // 
             // txtWindowHandle
             // 
-            this.txtWindowHandle.Location = new System.Drawing.Point(68, 56);
+            this.txtWindowHandle.Location = new System.Drawing.Point(60, 56);
             this.txtWindowHandle.MaxLength = 8;
             this.txtWindowHandle.Name = "txtWindowHandle";
             this.txtWindowHandle.Size = new System.Drawing.Size(72, 20);
@@ -88,7 +88,7 @@ namespace TestControl
             // 
             // lblWindowText
             // 
-            this.lblWindowText.Location = new System.Drawing.Point(16, 104);
+            this.lblWindowText.Location = new System.Drawing.Point(8, 104);
             this.lblWindowText.Name = "lblWindowText";
             this.lblWindowText.Size = new System.Drawing.Size(48, 16);
             this.lblWindowText.TabIndex = 6;
@@ -96,15 +96,15 @@ namespace TestControl
             // 
             // txtWindowText
             // 
-            this.txtWindowText.Location = new System.Drawing.Point(68, 100);
+            this.txtWindowText.Location = new System.Drawing.Point(60, 100);
             this.txtWindowText.Name = "txtWindowText";
             this.txtWindowText.ReadOnly = true;
-            this.txtWindowText.Size = new System.Drawing.Size(176, 20);
+            this.txtWindowText.Size = new System.Drawing.Size(194, 20);
             this.txtWindowText.TabIndex = 7;
             // 
             // lblWindowCharset
             // 
-            this.lblWindowCharset.Location = new System.Drawing.Point(16, 126);
+            this.lblWindowCharset.Location = new System.Drawing.Point(8, 126);
             this.lblWindowCharset.Name = "lblWindowCharset";
             this.lblWindowCharset.Size = new System.Drawing.Size(48, 16);
             this.lblWindowCharset.TabIndex = 8;
@@ -112,15 +112,15 @@ namespace TestControl
             // 
             // txtWindowCharset
             // 
-            this.txtWindowCharset.Location = new System.Drawing.Point(68, 122);
+            this.txtWindowCharset.Location = new System.Drawing.Point(60, 122);
             this.txtWindowCharset.Name = "txtWindowCharset";
             this.txtWindowCharset.ReadOnly = true;
-            this.txtWindowCharset.Size = new System.Drawing.Size(176, 20);
+            this.txtWindowCharset.Size = new System.Drawing.Size(194, 20);
             this.txtWindowCharset.TabIndex = 9;
             // 
             // lblFinderTool
             // 
-            this.lblFinderTool.Location = new System.Drawing.Point(16, 24);
+            this.lblFinderTool.Location = new System.Drawing.Point(8, 24);
             this.lblFinderTool.Name = "lblFinderTool";
             this.lblFinderTool.Size = new System.Drawing.Size(84, 16);
             this.lblFinderTool.TabIndex = 0;
@@ -128,15 +128,15 @@ namespace TestControl
             // 
             // txtWindowClass
             // 
-            this.txtWindowClass.Location = new System.Drawing.Point(68, 78);
+            this.txtWindowClass.Location = new System.Drawing.Point(60, 78);
             this.txtWindowClass.Name = "txtWindowClass";
             this.txtWindowClass.ReadOnly = true;
-            this.txtWindowClass.Size = new System.Drawing.Size(176, 20);
+            this.txtWindowClass.Size = new System.Drawing.Size(194, 20);
             this.txtWindowClass.TabIndex = 5;
             // 
             // lblWindowClass
             // 
-            this.lblWindowClass.Location = new System.Drawing.Point(16, 82);
+            this.lblWindowClass.Location = new System.Drawing.Point(8, 82);
             this.lblWindowClass.Name = "lblWindowClass";
             this.lblWindowClass.Size = new System.Drawing.Size(48, 16);
             this.lblWindowClass.TabIndex = 4;
@@ -197,7 +197,7 @@ namespace TestControl
             // lblWinRect
             // 
             this.lblWinRect.AutoSize = true;
-            this.lblWinRect.Location = new System.Drawing.Point(16, 148);
+            this.lblWinRect.Location = new System.Drawing.Point(8, 148);
             this.lblWinRect.Name = "lblWinRect";
             this.lblWinRect.Size = new System.Drawing.Size(52, 13);
             this.lblWinRect.TabIndex = 10;
@@ -205,16 +205,16 @@ namespace TestControl
             // 
             // txtWindowRect
             // 
-            this.txtWindowRect.Location = new System.Drawing.Point(68, 144);
+            this.txtWindowRect.Location = new System.Drawing.Point(60, 144);
             this.txtWindowRect.Name = "txtWindowRect";
             this.txtWindowRect.ReadOnly = true;
-            this.txtWindowRect.Size = new System.Drawing.Size(176, 20);
+            this.txtWindowRect.Size = new System.Drawing.Size(194, 20);
             this.txtWindowRect.TabIndex = 11;
             // 
             // windowFinder
             // 
             this.windowFinder.isFindOnlyTopLevel = false;
-            this.windowFinder.Location = new System.Drawing.Point(108, 20);
+            this.windowFinder.Location = new System.Drawing.Point(100, 20);
             this.windowFinder.Name = "windowFinder";
             this.windowFinder.Size = new System.Drawing.Size(31, 28);
             this.windowFinder.TabIndex = 1;
