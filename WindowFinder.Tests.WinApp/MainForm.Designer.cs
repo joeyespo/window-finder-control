@@ -27,6 +27,9 @@ namespace TestControl
         private void InitializeComponent()
         {
             this.gpbTrayMe = new System.Windows.Forms.GroupBox();
+            this.txtWindowRect = new System.Windows.Forms.TextBox();
+            this.lblWinRect = new System.Windows.Forms.Label();
+            this.windowFinder = new WindowFinder.WindowFinder();
             this.lblWindowHandle = new System.Windows.Forms.Label();
             this.txtWindowHandle = new System.Windows.Forms.TextBox();
             this.lblWindowText = new System.Windows.Forms.Label();
@@ -41,9 +44,7 @@ namespace TestControl
             this.radiobtnAimingFrame = new System.Windows.Forms.RadioButton();
             this.radiobtnInvertColor = new System.Windows.Forms.RadioButton();
             this.lblDpiAwareness = new System.Windows.Forms.Label();
-            this.lblWinRect = new System.Windows.Forms.Label();
-            this.txtWindowRect = new System.Windows.Forms.TextBox();
-            this.windowFinder = new WindowFinder.WindowFinder();
+            this.btnHelp = new System.Windows.Forms.Button();
             this.gpbTrayMe.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -68,6 +69,33 @@ namespace TestControl
             this.gpbTrayMe.Size = new System.Drawing.Size(260, 172);
             this.gpbTrayMe.TabIndex = 0;
             this.gpbTrayMe.TabStop = false;
+            // 
+            // txtWindowRect
+            // 
+            this.txtWindowRect.Location = new System.Drawing.Point(60, 144);
+            this.txtWindowRect.Name = "txtWindowRect";
+            this.txtWindowRect.ReadOnly = true;
+            this.txtWindowRect.Size = new System.Drawing.Size(194, 20);
+            this.txtWindowRect.TabIndex = 11;
+            // 
+            // lblWinRect
+            // 
+            this.lblWinRect.AutoSize = true;
+            this.lblWinRect.Location = new System.Drawing.Point(8, 148);
+            this.lblWinRect.Name = "lblWinRect";
+            this.lblWinRect.Size = new System.Drawing.Size(52, 13);
+            this.lblWinRect.TabIndex = 10;
+            this.lblWinRect.Text = "WinRect:";
+            // 
+            // windowFinder
+            // 
+            this.windowFinder.isFindOnlyTopLevel = false;
+            this.windowFinder.Location = new System.Drawing.Point(100, 20);
+            this.windowFinder.Name = "windowFinder";
+            this.windowFinder.Size = new System.Drawing.Size(31, 28);
+            this.windowFinder.TabIndex = 1;
+            this.windowFinder.tgwHighlightMethod = WindowFinder.WindowFinder.HighlightMethod.AimingFrame;
+            this.windowFinder.WindowHandleChanged += new System.EventHandler(this.windowFinder_WindowHandleChanged);
             // 
             // lblWindowHandle
             // 
@@ -194,38 +222,23 @@ namespace TestControl
             this.lblDpiAwareness.TabIndex = 10;
             this.lblDpiAwareness.Text = "?DPI awareness";
             // 
-            // lblWinRect
+            // btnHelp
             // 
-            this.lblWinRect.AutoSize = true;
-            this.lblWinRect.Location = new System.Drawing.Point(8, 148);
-            this.lblWinRect.Name = "lblWinRect";
-            this.lblWinRect.Size = new System.Drawing.Size(52, 13);
-            this.lblWinRect.TabIndex = 10;
-            this.lblWinRect.Text = "WinRect:";
-            // 
-            // txtWindowRect
-            // 
-            this.txtWindowRect.Location = new System.Drawing.Point(60, 144);
-            this.txtWindowRect.Name = "txtWindowRect";
-            this.txtWindowRect.ReadOnly = true;
-            this.txtWindowRect.Size = new System.Drawing.Size(194, 20);
-            this.txtWindowRect.TabIndex = 11;
-            // 
-            // windowFinder
-            // 
-            this.windowFinder.isFindOnlyTopLevel = false;
-            this.windowFinder.Location = new System.Drawing.Point(100, 20);
-            this.windowFinder.Name = "windowFinder";
-            this.windowFinder.Size = new System.Drawing.Size(31, 28);
-            this.windowFinder.TabIndex = 1;
-            this.windowFinder.tgwHighlightMethod = WindowFinder.WindowFinder.HighlightMethod.AimingFrame;
-            this.windowFinder.WindowHandleChanged += new System.EventHandler(this.windowFinder_WindowHandleChanged);
+            this.btnHelp.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.btnHelp.Location = new System.Drawing.Point(248, 12);
+            this.btnHelp.Name = "btnHelp";
+            this.btnHelp.Size = new System.Drawing.Size(20, 22);
+            this.btnHelp.TabIndex = 11;
+            this.btnHelp.Text = "?";
+            this.btnHelp.UseVisualStyleBackColor = true;
+            this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
             // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.btnClose;
             this.ClientSize = new System.Drawing.Size(380, 207);
+            this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.lblDpiAwareness);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnClose);
@@ -267,5 +280,6 @@ namespace TestControl
         private System.Windows.Forms.Label lblDpiAwareness;
         private System.Windows.Forms.TextBox txtWindowRect;
         private System.Windows.Forms.Label lblWinRect;
+        private System.Windows.Forms.Button btnHelp;
     }
 }

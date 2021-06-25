@@ -131,5 +131,10 @@ namespace TestControl
 
             lblDpiAwareness.Text = hint;
         }
+
+        private void btnHelp_Click(object sender, EventArgs e)
+        {
+            Program.ShowParameterHelp();
+        }
     }
 }

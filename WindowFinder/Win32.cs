@@ -642,6 +642,14 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
         };
 
         /// <summary>
+        /// Win81 SetProcessDpiAwareness() sets DPI-awareness for current process.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>HRESULT</returns>
+        [DllImport("Shcore.dll")]
+        public static extern int SetProcessDpiAwareness(PROCESS_DPI_AWARENESS value);
+
+        /// <summary>
         /// Win7 IsProcessDPIAware.
         /// </summary>
         /// <param name="hwnd"></param>
@@ -656,5 +664,18 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
         [DllImport("user32.dll")]
         public static extern bool SetProcessDPIAware();
 
+        public static bool IsWin81_or_above()
+        {
+            try
+            {
+                PROCESS_DPI_AWARENESS procdaw;
+                GetProcessDpiAwareness(Process.GetCurrentProcess().Handle, out procdaw);
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
     }
 }
