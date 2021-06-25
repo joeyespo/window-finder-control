@@ -16,7 +16,7 @@ namespace WindowFinder
     /// <summary>
     /// Win32 API.
     /// </summary>
-    internal static class Win32
+    public static class Win32
     {
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public struct POINTAPI
@@ -709,7 +709,7 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
         /// </summary>
         /// <param name="hwnd">The target HWND. If Zero, get DPI for own process.</param>
         /// <returns>DPI value 96, 120, 144 etc.</returns>
-        public static int Win81_GetWindowDpi(IntPtr hwnd)
+        public static int Win81_GetWindowDpi(IntPtr hwnd, Win32.Monitor_DPI_Type mdt = Win32.Monitor_DPI_Type.Effective)
         {
             Debug.Assert(IsWin81_or_above());
 
@@ -739,7 +739,7 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
                     return 96; // unexpected
                 //
                 int sysdpiX, sysdpiY;
-                int hr = Win32.GetDpiForMonitor(hmonitor, 0, out sysdpiX, out sysdpiY);
+                int hr = Win32.GetDpiForMonitor(hmonitor, mdt, out sysdpiX, out sysdpiY);
                 return sysdpiX;
             }
         }
