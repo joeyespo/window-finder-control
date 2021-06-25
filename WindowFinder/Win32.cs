@@ -205,10 +205,19 @@ namespace WindowFinder
                     scale_factor = (float) target_hwnd_dpi / 96;
                 }
             }
+            else if (DpiUtilities.IsWin81_or_above())
+            {
+                // TODO: Is this branch suitable as well for Win10.1607?
+
+                int selfdpi = DpiUtilities.Win81_GetWindowDpi(IntPtr.Zero);
+                int targetdpi = DpiUtilities.Win81_GetWindowDpi(hWnd);
+
+                scale_factor = (float)targetdpi / selfdpi; // may >1 or <1
+            }
 
             // Get the screen coordinates of the rectangle of the window.
             GetWindowRect(hWnd, out rt);
-
+            
             rt.right -= rt.left;
             rt.left = 0;
             rt.bottom -= rt.top;
@@ -291,8 +300,8 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
         /// </summary>
         internal static bool IsRelativeWindow(IntPtr hWnd, IntPtr hRelativeWindow, bool bProcessAncestor)
         {
-            int dwProcess = new int(), dwProcessOwner = new int();
-            int dwThread = new int(), dwThreadOwner = new int();
+            uint dwProcess = new int(), dwProcessOwner = new int();
+            uint dwThread = new int(), dwThreadOwner = new int();
             ;
 
             // Failsafe
@@ -304,8 +313,8 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
                 return true;
 
             // Get processes and threads
-            dwThread = GetWindowThreadProcessId(hWnd, ref dwProcess);
-            dwThreadOwner = GetWindowThreadProcessId(hRelativeWindow, ref dwProcessOwner);
+            dwThread = GetWindowThreadProcessId(hWnd, out dwProcess);
+            dwThreadOwner = GetWindowThreadProcessId(hRelativeWindow, out dwProcessOwner);
 
             // Get relative info
             if (bProcessAncestor)
@@ -468,9 +477,8 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
             ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetStockObject(int nIndex);
 
-        [DllImport("user32", EntryPoint = "GetWindowThreadProcessId", SetLastError = true, CharSet = CharSet.Auto,
-            ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
-        public static extern int GetWindowThreadProcessId(IntPtr hWnd, ref int lpdwProcessId);
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
         [DllImport("gdi32", EntryPoint = "DeleteObject", SetLastError = true, CharSet = CharSet.Auto,
             ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
@@ -493,32 +501,18 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
         public const int WHITE_BRUSH = unchecked((int) (0));
 
         [DllImport("user32.dll", SetLastError = true)]
-        static extern IntPtr GetDC(IntPtr hWnd);
+        public static extern IntPtr GetDC(IntPtr hWnd);
 
         [DllImport("gdi32.dll")]
-        static extern int GetDeviceCaps(IntPtr hdc, DeviceCap nIndex);
-
+        public static extern int GetDeviceCaps(IntPtr hdc, DeviceCap nIndex);
         //
         public enum DeviceCap
         {
-            /// <summary>
-            /// Horizontal width in pixels
-            /// </summary>
             HORZRES = 8,
-
-            /// <summary>
-            /// Vertical height in pixels
-            /// </summary>
             VERTRES = 10,
-
-            /// <summary>
-            /// Vertical height of entire desktop in pixels
-            /// </summary>
+            LOGPIXELSX = 88,
+            LOGPIXELSY = 90,
             DESKTOPVERTRES = 117,
-
-            /// <summary>
-            /// Horizontal width of entire desktop in pixels
-            /// </summary>
             DESKTOPHORZRES = 118,
         }
 
@@ -568,12 +562,40 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
             GW_ENABLEDPOPUP = 6
         }
 
-        [DllImport("gdi32.dll")]
-        static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+        /// <summary>
+        /// Since Win2000.
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <param name="dwFlags"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll")]
+        public static extern IntPtr MonitorFromWindow(IntPtr hwnd, int dwFlags);
 
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+        public const int MONITOR_DEFAULTTONULL = 0;
+        public const int MONITOR_DEFAULTTOPRIMARY = 1;
+        public const int MONITOR_DEFAULTTONEAREST = 2;
+
+        /// <summary>
+        /// Since Win81
+        /// </summary>
+        /// <param name="hmonitor"></param>
+        /// <param name="dpitype"></param>
+        /// <param name="dpiX"></param>
+        /// <param name="dpiY"></param>
+        /// <returns></returns>
+        [DllImport("Shcore.dll")]
+        public static extern int GetDpiForMonitor(IntPtr hmonitor, Monitor_DPI_Type dpitype, out int dpiX, out int dpiY);
+        //
+        public enum Monitor_DPI_Type : int
+        {
+            Effective = 0,
+            Angular = 1,
+            Raw = 2,
+            Default = Effective
+        }
     }
+
+
 
     public static class DpiUtilities
     {
@@ -650,9 +672,8 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
         public static extern int SetProcessDpiAwareness(PROCESS_DPI_AWARENESS value);
 
         /// <summary>
-        /// Win7 IsProcessDPIAware.
+        /// Win7 IsProcessDPIAware().
         /// </summary>
-        /// <param name="hwnd"></param>
         /// <returns></returns>
         [DllImport("user32.dll")]
         public static extern bool IsProcessDPIAware();
@@ -664,6 +685,10 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
         [DllImport("user32.dll")]
         public static extern bool SetProcessDPIAware();
 
+        /// <summary>
+        /// Detect if we are running on Win81+ by checking if GetProcessDpiAwareness() exists.
+        /// </summary>
+        /// <returns></returns>
         public static bool IsWin81_or_above()
         {
             try
@@ -672,9 +697,50 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
                 GetProcessDpiAwareness(Process.GetCurrentProcess().Handle, out procdaw);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Get DPI value(96, 120, 144) in eye of a target HWND.
+        /// Limitation? every monitor must be same DPI?
+        /// </summary>
+        /// <param name="hwnd">The target HWND. If Zero, get DPI for own process.</param>
+        /// <returns>DPI value 96, 120, 144 etc.</returns>
+        public static int Win81_GetWindowDpi(IntPtr hwnd)
+        {
+            Debug.Assert(IsWin81_or_above());
+
+            if (hwnd == IntPtr.Zero)
+            {
+                IntPtr hdc = Win32.GetDC(IntPtr.Zero);
+                int dpi = Win32.GetDeviceCaps(hdc, Win32.DeviceCap.LOGPIXELSX);
+                return dpi;
+            }
+
+            uint pid = 0;
+            Win32.GetWindowThreadProcessId(hwnd, out pid);
+            Process process = Process.GetProcessById((int)pid);
+            // process.MainModule.FileName.ToString();
+
+            PROCESS_DPI_AWARENESS procdaw;
+            GetProcessDpiAwareness(process.Handle, out procdaw);
+
+            if (procdaw == DpiUtilities.PROCESS_DPI_AWARENESS.PROCESS_DPI_UNAWARE)
+            {
+                return 96;
+            }
+            else
+            {
+                IntPtr hmonitor = Win32.MonitorFromWindow(hwnd, Win32.MONITOR_DEFAULTTONULL);
+                if (hmonitor == IntPtr.Zero)
+                    return 96; // unexpected
+                //
+                int sysdpiX, sysdpiY;
+                int hr = Win32.GetDpiForMonitor(hmonitor, 0, out sysdpiX, out sysdpiY);
+                return sysdpiX;
             }
         }
     }
