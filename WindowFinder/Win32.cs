@@ -705,11 +705,12 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
 
         /// <summary>
         /// Get DPI value(96, 120, 144) in eye of a target HWND.
+        /// This function is tricky.
         /// Limitation? every monitor must be same DPI?
         /// </summary>
         /// <param name="hwnd">The target HWND. If Zero, get DPI for own process.</param>
         /// <returns>DPI value 96, 120, 144 etc.</returns>
-        public static int Win81_GetWindowDpi(IntPtr hwnd, Win32.Monitor_DPI_Type mdt = Win32.Monitor_DPI_Type.Effective)
+        public static int Win81_GetWindowDpi(IntPtr hwnd)
         {
             Debug.Assert(IsWin81_or_above());
 
@@ -739,9 +740,31 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
                     return 96; // unexpected
                 //
                 int sysdpiX, sysdpiY;
-                int hr = Win32.GetDpiForMonitor(hmonitor, mdt, out sysdpiX, out sysdpiY);
+                int hr = Win32.GetDpiForMonitor(hmonitor, Win32.Monitor_DPI_Type.Effective, 
+                    out sysdpiX, out sysdpiY);
                 return sysdpiX;
             }
+        }
+
+        /// <summary>
+        /// Just for testing Win81 GetDpiForMonitor behavior.
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <param name="mdt"></param>
+        /// <returns></returns>
+        public static int Win81_TestMonitorDpi(IntPtr hwnd,
+            Win32.Monitor_DPI_Type mdt = Win32.Monitor_DPI_Type.Effective)
+        {
+            IntPtr hmonitor = Win32.MonitorFromWindow(hwnd, Win32.MONITOR_DEFAULTTONULL);
+            if (hmonitor == IntPtr.Zero)
+                return 0;
+
+            int sysdpiX, sysdpiY;
+            int hr = Win32.GetDpiForMonitor(hmonitor, mdt, out sysdpiX, out sysdpiY);
+            if (hr != 0)
+                return hr;
+
+            return sysdpiX;
         }
     }
 }
