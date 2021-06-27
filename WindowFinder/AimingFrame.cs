@@ -9,7 +9,10 @@ namespace WindowFinder
 {
     class AimingFrame : Form
     {
-        static Color MyTransParentColor = Color.Black;
+        private static Color MyTransparentColor = Color.Black;
+        private static Color FrameColor = Color.Red;
+        private static int FrameWidth = 3;
+
 
         public AimingFrame()
         {
@@ -20,17 +23,30 @@ namespace WindowFinder
             // Enable this to make a "tool window", so it does NOT appear in taskbar
             this.ShowInTaskbar = false; 
 
-            this.TransparencyKey = MyTransParentColor;
+            this.TransparencyKey = MyTransparentColor;
 
-            // Add a secret sizing grip at bottom right corner(optional). Effective?
-            //this.SizeGripStyle = SizeGripStyle.Show;
+            // Create a hint label to show aimed area width info.
+
+            this.lblHint = new System.Windows.Forms.Label();
+            this.Controls.Add(this.lblHint);
+            this.lblHint.BackColor = Color.White;
+            this.lblHint.ForeColor = FrameColor;
+            this.lblHint.Location = new System.Drawing.Point(FrameWidth+1, FrameWidth+1);
+            this.lblHint.AutoSize = true;
+            this.lblHint.Font = new Font("Tahoma", 8);
+            this.lblHint.Text = "ABC"; // set later
+        }
+
+        public void SetHint(string text)
+        {
+            lblHint.Text = text;
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
 
-            using (Pen BorderPen = new Pen(Color.Red, 6))
+            using (Pen BorderPen = new Pen(FrameColor, FrameWidth*2))
             {
                 e.Graphics.DrawRectangle(BorderPen, this.ClientRectangle);
             }
@@ -38,7 +54,7 @@ namespace WindowFinder
 
         protected override void OnPaintBackground(PaintEventArgs e)
         {
-            using (Brush BgBrush = new SolidBrush(MyTransParentColor))
+            using (Brush BgBrush = new SolidBrush(MyTransparentColor))
             {
                 e.Graphics.FillRectangle(BgBrush, this.ClientRectangle);
             }
@@ -50,5 +66,6 @@ namespace WindowFinder
             Invalidate();
         }
 
+        private System.Windows.Forms.Label lblHint;
     }
 }

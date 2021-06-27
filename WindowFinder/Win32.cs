@@ -265,8 +265,11 @@ namespace WindowFinder
         /// </summary>
         /// <param name="hWnd"></param>
         /// <param name="hwndOverlay"></param>
-        internal static void HighlightWindow_Overlaying(IntPtr hWnd, IntPtr hwndOverlay)
+        /// <returns>Return physical(pixel) coordiante of the target hWnd.</returns>
+        internal static RECT HighlightWindow_Overlaying(IntPtr hWnd, IntPtr hwndOverlay)
         {
+            RECT rtp = new RECT(); // p: physical coordinate, as return value.
+
             /* This is unnecessary for Win81 and Win10.1607+
             IntPtr thread_oldctx = IntPtr.Zero;
 
@@ -280,6 +283,8 @@ namespace WindowFinder
             RECT rt = new RECT();
             GetWindowRect(hWnd, out rt);
 
+            rtp = rt; // assume equal, adjust later (TODO)
+
             IntPtr hwndToplevel = Win32.GetAncestor(hWnd, Win32.GetAncestorFlags.GetRoot);
 
             if (DpiUtilities.IsWin7() && (DpiUtilities.Win7_SystemDpi() > 96))
@@ -288,7 +293,7 @@ namespace WindowFinder
             }
 
             Win32.SetWindowPos(hwndOverlay, Win32.HWND_TOP,
-                rt.left, rt.top, (rt.right - rt.left), (rt.bottom - rt.top)
+                rt.left, rt.top, rt.Width, rt.Height
             );
 
             //
@@ -315,6 +320,8 @@ namespace WindowFinder
                 DpiUtilities.SetThreadDpiAwarenessContext(thread_oldctx); // restore ctx
             }
             */
+
+            return rtp;
         }
 
         /// <summary>

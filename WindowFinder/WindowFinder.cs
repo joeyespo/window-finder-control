@@ -434,8 +434,14 @@ namespace WindowFinder
             {
                 if (targetWindow == IntPtr.Zero)
                 {
-                    _aimframe.Show(); // highlight on for new window
-                    Win32.HighlightWindow_Overlaying(hWnd, _aimframe.Handle);
+                    // highlight on for new window
+                    // Note: If I place this _aimframe.Show() after HighlightWindow_Overlaying(),
+                    // the aiming-frame will be brought to front, which is not desired.
+                    _aimframe.Show(); 
+
+                    Win32.RECT rtp = Win32.HighlightWindow_Overlaying(hWnd, _aimframe.Handle);
+
+                    _aimframe.SetHint($"{rtp.Width} x {rtp.Height}");
                 }
                 else
                 {
