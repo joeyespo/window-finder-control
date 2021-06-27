@@ -269,11 +269,13 @@ namespace WindowFinder
         {
             IntPtr thread_oldctx = IntPtr.Zero;
 
+            /* This is unnecessary for Win81 and Win10.1607+
             if (IsAboveWin10_1607())
             {
                 thread_oldctx =
                     DpiUtilities.SetThreadDpiAwarenessContext(DpiUtilities.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
             }
+            */
 
             RECT rt = new RECT();
             GetWindowRect(hWnd, out rt);
@@ -307,10 +309,12 @@ namespace WindowFinder
                 //Debug.WriteLine($"### {(uint)hwndHigher:X8} -> {(uint)hwndOverlay:X8} -> {(uint)hwndToplevel:X8}");
             }
 
+            /* This is unnecessary for Win81 and Win10.1607+
             if (IsAboveWin10_1607())
             {
                 DpiUtilities.SetThreadDpiAwarenessContext(thread_oldctx); // restore ctx
             }
+            */
         }
 
         /// <summary>
