@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using System.Xml;
 
 
@@ -35,6 +36,18 @@ namespace WindowFinder
             public int top;
             public int right;
             public int bottom;
+
+            public int Height
+            {
+                get { return bottom - top; }
+                set { bottom = value + top; }
+            }
+
+            public int Width
+            {
+                get { return right - left; }
+                set { right = value + left; }
+            }
         }
 
         /// <summary>
@@ -267,6 +280,11 @@ namespace WindowFinder
 
             IntPtr hwndToplevel = Win32.GetAncestor(hWnd, Win32.GetAncestorFlags.GetRoot);
 
+            if (DpiUtilities.IsWin7() && (DpiUtilities.Win7_SystemDpi() > 96))
+            {
+                Win7_SpecialAdjust(hWnd, ref rt);
+            }
+
             Win32.SetWindowPos(hwndOverlay, Win32.HWND_TOP,
                 rt.left, rt.top, (rt.right - rt.left), (rt.bottom - rt.top)
             );
@@ -293,6 +311,86 @@ namespace WindowFinder
             {
                 DpiUtilities.SetThreadDpiAwarenessContext(thread_oldctx); // restore ctx
             }
+        }
+
+        /// <summary>
+        /// Todo comment
+        /// </summary>
+        /// <param name="hwnd0"></param>
+        /// <param name="winrect"></param>
+        private static void Win7_SpecialAdjust(IntPtr hwnd0, ref RECT rect0)
+        {
+            Debug.Assert(DpiUtilities.IsWin7());
+            Debug.Assert(DpiUtilities.Win7_SystemDpi() > 96);
+
+            // Note: Only top-level window can be queried for DWM window rect.
+
+            IntPtr hwndtop = Win32.GetAncestor(hwnd0, Win32.GetAncestorFlags.GetRoot);
+            RECT recttop;
+            GetWindowRect(hwndtop, out recttop);
+
+            //RECT rttop = GetWindowRect_DWM(hwndtop);
+
+            //Debug.WriteLine($"DWM: width {rttop.Width} , height {rttop.Height}");
+
+            bool isCallerStdDpi = DpiUtilities.Win7_IsCallerStdDpi();
+            int sysdpi = DpiUtilities.Win7_SystemDpi();
+
+            float scale_factor = (float)sysdpi / 96;
+
+            int width_upscaled = recttop.Width * sysdpi / 96;
+
+            int[] top_widths = new int[] { recttop.Width, width_upscaled };
+
+            int match = FindMatchingWidth_byDWM(hwndtop, top_widths[0], top_widths[1]);
+
+            if (isCallerStdDpi)
+            {
+                // Assume sysdpi=144 (1.5X), and hwnd0 virtual width is 400,
+                // then hwnd0 may be in two cases:
+                // 1. a DPI-unaware window that has physical width 400*1.5=600 .
+                // 2. a Sys-DPI-aware window this has physical width 400 .
+                // For case 1, the caller should SetWindowPos() with a width of 600/1.5=400 .
+                // For case 2, the caller should SetWindowPos() with a width of 400/1.5=267 .
+
+                if (match == 0) // case 2
+                {
+                    rect0.left = Convert.ToInt32(rect0.left / scale_factor);
+                    rect0.top = Convert.ToInt32(rect0.top / scale_factor);
+                    rect0.right = Convert.ToInt32(rect0.right / scale_factor);
+                    rect0.bottom = Convert.ToInt32(rect0.bottom / scale_factor);
+                }
+            }
+            else
+            {
+                // Assume sysdpi=144 (1.5X), and hwnd0 virtual width is 400,
+                // then hwnd0 may be in two cases:
+                // 1. a DPI-unaware window that has physical width 400*1.5=600 .
+                // 2. a Sys-DPI-aware window this has physical width 400 .
+                // For case 1, the caller should SetWindowPos() with a width of 600 .
+                // For case 2, the caller should SetWindowPos() with a width of 400 .
+
+                if (match == 1) // case 1
+                {
+                    rect0.left = Convert.ToInt32(rect0.left * scale_factor);
+                    rect0.top = Convert.ToInt32(rect0.top * scale_factor);
+                    rect0.right = Convert.ToInt32(rect0.right * scale_factor);
+                    rect0.bottom = Convert.ToInt32(rect0.bottom * scale_factor);
+                }
+            }
+
+        }
+
+        private static int FindMatchingWidth_byDWM(IntPtr hwnd, int width0, int width1)
+        {
+            RECT rtdwm = GetWindowRect_DWM(hwnd);
+            int diff0 = Math.Abs(rtdwm.Width - width0);
+            int diff1 = Math.Abs(rtdwm.Width - width1);
+
+            if (diff0 < diff1)
+                return 0;
+            else
+                return 1;
         }
 
         /// <summary>
@@ -365,13 +463,13 @@ namespace WindowFinder
         public static extern int MapWindowPoints(IntPtr hwndFrom, IntPtr hwndTo, ref RECT lprt, int cPoints);
 
         [DllImport("user32", ExactSpelling = true, SetLastError = true)]
-        public static extern int MapWindowPoints(IntPtr hWndFrom, IntPtr hWndTo, [In, Out] ref System.Drawing.Point pt,
+        public static extern int MapWindowPoints(IntPtr hWndFrom, IntPtr hWndTo, [In, Out] ref Point pt,
             [MarshalAs(UnmanagedType.U4)] int cPoints);
 
         //[DllImport("user32", EntryPoint = "ChildWindowFromPoint", SetLastError = true, CharSet = CharSet.Auto, ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         //public static extern int ChildWindowFromPoint(IntPtr hWnd, int xPoint, int yPoint);
         [DllImport("user32.dll")]
-        public static extern IntPtr ChildWindowFromPoint(IntPtr hWndParent, System.Drawing.Point pt);
+        public static extern IntPtr ChildWindowFromPoint(IntPtr hWndParent, Point pt);
 
         [DllImport("user32.dll")]
         public static extern IntPtr ChildWindowFromPointEx(IntPtr hWndParent, Point pt,
@@ -449,7 +547,7 @@ namespace WindowFinder
         public static extern int CreateRectRgnIndirect(ref RECT lpRect);
 
         [DllImport("user32.dll")]
-        public static extern IntPtr WindowFromPoint(System.Drawing.Point p);
+        public static extern IntPtr WindowFromPoint(Point p);
 
         [DllImport("gdi32.dll")]
         public static extern IntPtr CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
@@ -574,6 +672,46 @@ namespace WindowFinder
         public const int MONITOR_DEFAULTTONULL = 0;
         public const int MONITOR_DEFAULTTOPRIMARY = 1;
         public const int MONITOR_DEFAULTTONEAREST = 2;
+
+        [DllImport("dwmapi.dll")]
+        static extern int DwmGetWindowAttribute(IntPtr hwnd, Win32.DWMWINDOWATTRIBUTE dwAttribute, out bool pvAttribute, int cbAttribute);
+
+        [DllImport("dwmapi.dll")]
+        static extern int DwmGetWindowAttribute(IntPtr hwnd, Win32.DWMWINDOWATTRIBUTE dwAttribute, out Win32.RECT pvAttribute, int cbAttribute);
+
+        public enum DWMWINDOWATTRIBUTE : uint
+        {
+            NCRenderingEnabled = 1,
+            NCRenderingPolicy,
+            TransitionsForceDisabled,
+            AllowNCPaint,
+            CaptionButtonBounds,
+            NonClientRtlLayout,
+            ForceIconicRepresentation,
+            Flip3DPolicy,
+            ExtendedFrameBounds, // we use this
+            HasIconicBitmap,
+            DisallowPeek,
+            ExcludedFromPeek,
+            Cloak,
+            Cloaked,
+            FreezeRepresentation
+        }
+
+        /// <summary>
+        /// Win7+, only effective on a top-level window.
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <returns></returns>
+        public static RECT GetWindowRect_DWM(IntPtr hwnd)
+        {
+            RECT rt;
+            DwmGetWindowAttribute(hwnd, DWMWINDOWATTRIBUTE.ExtendedFrameBounds, out rt,
+                Marshal.SizeOf(typeof(RECT)));
+
+            return rt;
+        }
+
 
         /// <summary>
         /// Since Win81
@@ -765,6 +903,63 @@ namespace WindowFinder
                 return hr;
 
             return sysdpiX;
+        }
+
+        public static bool IsWin7()
+        {
+            if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
+                return true;
+            else
+                return false;
+        }
+
+        private static int s_win7_system_dpi = 0; // 0 means unset
+
+        /// <summary>
+        /// Get Win7 system DPI, which is a system-wide value set by human user.
+        /// It will not change until user logs off and on.
+        /// 
+        /// This code works both on "caller is 96dpi" and "caller is System-DPI".
+        /// </summary>
+        /// <returns></returns>
+        public static int Win7_SystemDpi()
+        {
+            if (s_win7_system_dpi > 0)
+                return s_win7_system_dpi;
+
+            IntPtr hdc = Win32.GetDC(IntPtr.Zero);
+
+            int selfdpi = Win32.GetDeviceCaps(hdc, Win32.DeviceCap.LOGPIXELSX);
+            if (selfdpi > 96)
+            {
+                // We conclude that it is the very System-DPI, 120, 144 etc.
+                s_win7_system_dpi = selfdpi;
+            }
+            else
+            {
+                // The system-dpi may be 96, or larger.
+
+                float realres = Win32.GetDeviceCaps(hdc, Win32.DeviceCap.DESKTOPHORZRES);
+                float logires = Win32.GetDeviceCaps(hdc, Win32.DeviceCap.HORZRES);
+
+                s_win7_system_dpi = Convert.ToInt32(96 * realres / logires);
+            }
+
+            Win32.ReleaseDC(IntPtr.Zero, hdc);
+
+            return s_win7_system_dpi;
+        }
+
+        public static bool Win7_IsCallerStdDpi()
+        {
+            IntPtr hdc = Win32.GetDC(IntPtr.Zero);
+            int selfdpi = Win32.GetDeviceCaps(hdc, Win32.DeviceCap.LOGPIXELSX);
+            Win32.ReleaseDC(IntPtr.Zero, hdc);
+
+            if (selfdpi == 96)
+                return true;
+            else
+                return false;
         }
     }
 }
