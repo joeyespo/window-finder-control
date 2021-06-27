@@ -48,6 +48,14 @@ namespace WindowFinder
                 get { return right - left; }
                 set { right = value + left; }
             }
+
+            public void DoScale(float scale_factor)
+            {
+                left = Convert.ToInt32(left * scale_factor);
+                top = Convert.ToInt32(top * scale_factor);
+                right = Convert.ToInt32(right * scale_factor);
+                bottom = Convert.ToInt32(bottom * scale_factor);
+            }
         }
 
         /// <summary>
@@ -379,10 +387,7 @@ namespace WindowFinder
 
                 if (match == 0) // case 2
                 {
-                    rect0.left = Convert.ToInt32(rect0.left / scale_factor);
-                    rect0.top = Convert.ToInt32(rect0.top / scale_factor);
-                    rect0.right = Convert.ToInt32(rect0.right / scale_factor);
-                    rect0.bottom = Convert.ToInt32(rect0.bottom / scale_factor);
+                    rect0.DoScale(1.0f / scale_factor);
                 }
             }
             else
@@ -396,10 +401,7 @@ namespace WindowFinder
 
                 if (match == 1) // case 1
                 {
-                    rect0.left = Convert.ToInt32(rect0.left * scale_factor);
-                    rect0.top = Convert.ToInt32(rect0.top * scale_factor);
-                    rect0.right = Convert.ToInt32(rect0.right * scale_factor);
-                    rect0.bottom = Convert.ToInt32(rect0.bottom * scale_factor);
+                    rect0.DoScale(scale_factor);
                 }
             }
 
