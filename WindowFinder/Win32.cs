@@ -267,9 +267,9 @@ namespace WindowFinder
         /// <param name="hwndOverlay"></param>
         internal static void HighlightWindow_Overlaying(IntPtr hWnd, IntPtr hwndOverlay)
         {
+            /* This is unnecessary for Win81 and Win10.1607+
             IntPtr thread_oldctx = IntPtr.Zero;
 
-            /* This is unnecessary for Win81 and Win10.1607+
             if (IsAboveWin10_1607())
             {
                 thread_oldctx =
