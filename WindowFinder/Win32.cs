@@ -314,7 +314,20 @@ namespace WindowFinder
         }
 
         /// <summary>
-        /// Todo comment
+        /// This function deals with a hard problem on a Win7 with System DPI set to non-100% (assume 150%).
+        /// If we (window-finder code) gets a width of 400 from GetWindowRect(hwnd0),
+        /// also assuming we are DPI-unaware program, then we are actually facing TWO cases:
+        ///  1. The hwnd0 is also DPI-unaware, and it is actually occupying 400*1.5=600 physical pixels.
+        ///  2. The hwnd0 is Sysdpi-aware, so it is occupying exactly 400 physical pixels.
+        /// Then how do we distinguish between the TWO cases? Windows 7 does not give up out-of-box
+        /// API call to distinguish them, so we need to circumvent it brilliantly.
+        /// 
+        /// This happens similarly as well if we are a System-DPI-awareness program.
+        ///
+        /// Luckily, there is a way. DwmGetWindowAttribute(DWMWA_EXTENDED_FRAME_BOUNDS) will tell us
+        /// a top-level windows's phyiscal dimension(location, width), with the help of DWM-rect,
+        /// we can finally distinguish the TWO cases.
+        /// 
         /// </summary>
         /// <param name="hwnd0"></param>
         /// <param name="winrect"></param>
