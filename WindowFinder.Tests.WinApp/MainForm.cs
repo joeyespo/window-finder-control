@@ -134,21 +134,6 @@ namespace TestControl
 
         private void btnHelp_Click(object sender, EventArgs e)
         {
-            Win32.Monitor_DPI_Type mdt = Win32.Monitor_DPI_Type.Effective;
-            int dpi01 = DpiUtilities.Win81_TestMonitorDpi((IntPtr)0x200694, mdt);
-            int dpi02 = DpiUtilities.Win81_TestMonitorDpi((IntPtr)0xd05aa, mdt);
-            int dpi03 = DpiUtilities.Win81_TestMonitorDpi((IntPtr)0x170344, mdt);
-
-            mdt = Win32.Monitor_DPI_Type.Angular;
-            int dpi11 = DpiUtilities.Win81_TestMonitorDpi((IntPtr)0x200694, mdt);
-            int dpi12 = DpiUtilities.Win81_TestMonitorDpi((IntPtr)0xd05aa, mdt);
-            int dpi13 = DpiUtilities.Win81_TestMonitorDpi((IntPtr)0x170344, mdt);
-
-            mdt = Win32.Monitor_DPI_Type.Raw;
-            int dpi21 = DpiUtilities.Win81_TestMonitorDpi((IntPtr)0x200694, mdt);
-            int dpi22 = DpiUtilities.Win81_TestMonitorDpi((IntPtr)0xd05aa, mdt);
-            int dpi23 = DpiUtilities.Win81_TestMonitorDpi((IntPtr)0x170344, mdt);
-
             Program.ShowParameterHelp();
         }
     }

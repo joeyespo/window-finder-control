@@ -207,12 +207,14 @@ namespace WindowFinder
             }
             else if (DpiUtilities.IsWin81_or_above())
             {
-                // TODO: Is this branch suitable as well for Win10.1607?
+                // This section is only suitable to Win81
 
                 int selfdpi = DpiUtilities.Win81_GetWindowDpi(IntPtr.Zero);
                 int targetdpi = DpiUtilities.Win81_GetWindowDpi(hWnd);
 
-                scale_factor = (float)targetdpi / selfdpi; // may >1 or <1
+                scale_factor = (float)targetdpi / selfdpi; // may =1 or <1
+
+                // [2021-06-26] Messy on Win81: Still buggy when caller is Per-mon-aware.
             }
 
             // Get the screen coordinates of the rectangle of the window.
@@ -262,8 +264,6 @@ namespace WindowFinder
 
             RECT rt = new RECT();
             GetWindowRect(hWnd, out rt);
-
-Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left},{rt.bottom-rt.top})");
 
             IntPtr hwndToplevel = Win32.GetAncestor(hWnd, Win32.GetAncestorFlags.GetRoot);
 
@@ -752,7 +752,7 @@ Debug.WriteLine($"GetWindowRect() LT({rt.left},{rt.top}) , W*H({rt.right-rt.left
         /// <param name="hwnd"></param>
         /// <param name="mdt"></param>
         /// <returns></returns>
-        public static int Win81_TestMonitorDpi(IntPtr hwnd,
+        public static int Win81_GetMonitorDpi(IntPtr hwnd,
             Win32.Monitor_DPI_Type mdt = Win32.Monitor_DPI_Type.Effective)
         {
             IntPtr hmonitor = Win32.MonitorFromWindow(hwnd, Win32.MONITOR_DEFAULTTONULL);
