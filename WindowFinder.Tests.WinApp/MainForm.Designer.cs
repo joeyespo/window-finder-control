@@ -26,6 +26,7 @@ namespace TestControl
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.gpbTrayMe = new System.Windows.Forms.GroupBox();
             this.txtWindowRect = new System.Windows.Forms.TextBox();
             this.lblWinRect = new System.Windows.Forms.Label();
@@ -46,6 +47,7 @@ namespace TestControl
             this.lblDpiAwareness = new System.Windows.Forms.Label();
             this.btnHelp = new System.Windows.Forms.Button();
             this.ckbClipboard = new System.Windows.Forms.CheckBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.gpbTrayMe.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -241,9 +243,10 @@ namespace TestControl
             this.ckbClipboard.AutoSize = true;
             this.ckbClipboard.Location = new System.Drawing.Point(285, 177);
             this.ckbClipboard.Name = "ckbClipboard";
-            this.ckbClipboard.Size = new System.Drawing.Size(85, 17);
+            this.ckbClipboard.Size = new System.Drawing.Size(80, 17);
             this.ckbClipboard.TabIndex = 12;
-            this.ckbClipboard.Text = "To clipboar&d";
+            this.ckbClipboard.Text = "&Screenshot";
+            this.toolTip1.SetToolTip(this.ckbClipboard, "Send to clipboard the screenshot from target window location");
             this.ckbClipboard.UseVisualStyleBackColor = true;
             this.ckbClipboard.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ckbClipboard_MouseClick);
             // 
@@ -272,11 +275,6 @@ namespace TestControl
         }
 
         #endregion
-
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
-        private System.ComponentModel.Container components = null;
         private System.Windows.Forms.GroupBox gpbTrayMe;
         private System.Windows.Forms.Label lblFinderTool;
         private System.Windows.Forms.Button btnClose;
@@ -297,5 +295,7 @@ namespace TestControl
         private System.Windows.Forms.Label lblWinRect;
         private System.Windows.Forms.Button btnHelp;
         private System.Windows.Forms.CheckBox ckbClipboard;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.ComponentModel.IContainer components;
     }
 }
