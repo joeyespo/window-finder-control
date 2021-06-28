@@ -297,7 +297,7 @@ namespace WindowFinder
 
             if (DpiUtilities.IsWin7() && (DpiUtilities.Win7_SystemDpi() > 96))
             {
-                Win7_SpecialAdjust(hWnd, ref rt);
+                rtp = Win7_SpecialAdjust(hWnd, ref rt);
             }
 
             Win32.SetWindowPos(hwndOverlay, Win32.HWND_TOP,
@@ -350,10 +350,13 @@ namespace WindowFinder
         /// </summary>
         /// <param name="hwnd0"></param>
         /// <param name="winrect"></param>
-        private static void Win7_SpecialAdjust(IntPtr hwnd0, ref RECT rect0)
+        /// <returns>Physical coornidates of hwnd0's Rect.</returns>
+        private static RECT Win7_SpecialAdjust(IntPtr hwnd0, ref RECT rect0)
         {
             Debug.Assert(DpiUtilities.IsWin7());
             Debug.Assert(DpiUtilities.Win7_SystemDpi() > 96);
+
+            RECT rect0_physical = rect0; // adjust soon
 
             // Note: Only top-level window can be queried for DWM window rect.
 
@@ -389,6 +392,10 @@ namespace WindowFinder
                 {
                     rect0.DoScale(1.0f / scale_factor);
                 }
+                else // case 1
+                {
+                    rect0_physical.DoScale(scale_factor);
+                }
             }
             else
             {
@@ -402,9 +409,12 @@ namespace WindowFinder
                 if (match == 1) // case 1
                 {
                     rect0.DoScale(scale_factor);
+
+                    rect0_physical.DoScale(scale_factor);
                 }
             }
 
+            return rect0_physical;
         }
 
         private static int FindMatchingWidth_byDWM(IntPtr hwnd, int width0, int width1)
