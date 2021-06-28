@@ -288,21 +288,39 @@ namespace WindowFinder
             }
             */
 
-            RECT rt = new RECT();
-            GetWindowRect(hWnd, out rt);
+            RECT rtv = new RECT(); // v: implies virtual coordinate from API user's perspective
+            GetWindowRect(hWnd, out rtv);
 
-            rtp = rt; // assume equal, adjust later (TODO)
+            rtp = rtv; // assume equal, adjust soon
 
             IntPtr hwndToplevel = Win32.GetAncestor(hWnd, Win32.GetAncestorFlags.GetRoot);
 
             if (DpiUtilities.IsWin7() && (DpiUtilities.Win7_SystemDpi() > 96))
             {
-                rtp = Win7_SpecialAdjust(hWnd, ref rt);
+                rtp = Win7_SpecialAdjust(hWnd, ref rtv);
             }
 
             Win32.SetWindowPos(hwndOverlay, Win32.HWND_TOP,
-                rt.left, rt.top, rt.Width, rt.Height
+                rtv.left, rtv.top, rtv.Width, rtv.Height
             );
+            //
+            if (IsAboveWin10_1607() && !DpiUtilities.IsSelfPermonAware())
+            {
+                // For non-Per-mon cases, we have to adjust rtv to get physical coordinates.
+                // Only be switching our thread to Per-mon-aware perspective, can we get the physical coords.
+
+                IntPtr thread_oldctx =
+                    DpiUtilities.SetThreadDpiAwarenessContext(DpiUtilities.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+
+                GetWindowRect(hWnd, out rtp);
+
+                DpiUtilities.SetThreadDpiAwarenessContext(thread_oldctx);
+            }
+            //
+            if (DpiUtilities.IsWin81())
+            {
+                // ... todo: Prompt to user that rtv is not exact
+            }
 
             //
             // Now we also want to place the aiming-window JUST ABOVE the target hWnd (z-order),
@@ -860,6 +878,29 @@ namespace WindowFinder
         public static extern bool SetProcessDPIAware();
 
         /// <summary>
+        /// A helper wrapper, true if Win81+ Per-mon-aware or Win10.1607+ Per-mon-aware-V2.
+        /// With such Per-mon-aware, window coordinates from GetWindowRect() are already physical.
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsSelfPermonAware()
+        {
+            if (IsWin7())
+                return false;
+
+            PROCESS_DPI_AWARENESS procdaw;
+            int hr = GetProcessDpiAwareness(Process.GetCurrentProcess().Handle, out procdaw);
+            if (hr == 0)
+            {
+                if (procdaw == PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE)
+                    return true;
+                else
+                    return false;
+            }
+            else
+                return false;
+        }
+
+        /// <summary>
         /// Detect if we are running on Win81+ by checking if GetProcessDpiAwareness() exists.
         /// </summary>
         /// <returns></returns>
@@ -941,12 +982,86 @@ namespace WindowFinder
             return sysdpiX;
         }
 
+        private static int s_sigWin7 = -1;
+
+        /// <summary>
+        /// We consider Win7 and Win8.0 the same, and returns true.
+        /// </summary>
+        /// <returns></returns>
         public static bool IsWin7()
         {
-            if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
-                return true;
-            else
+            // We cannot check Environment.OSVersion.Version for 6.1.xxxx or 6.2.xxxx,
+            // bcz Win8.0 and Win10 will both give us 6.2.9200 as designed by Microsoft.
+
+            if (s_sigWin7 != -1)
+            {
+                return s_sigWin7 == 1 ? true : false;
+            }
+
+            if (Environment.OSVersion.Version.Major != 6)
+            {
+                s_sigWin7 = 0;
                 return false;
+            }
+
+            try
+            {
+                PROCESS_DPI_AWARENESS procdaw;
+                GetProcessDpiAwareness(Process.GetCurrentProcess().Handle, out procdaw); // Win81+ only
+                s_sigWin7 = 0;
+                return false;
+            }
+            catch (Exception)
+            {
+                s_sigWin7 = 1; // win7
+                return true;
+            }
+        }
+
+        private static int s_sigWin81 = -1;
+        /// <summary>
+        /// We'll consider Windows 8.1 and Windows 10 prior to 1607 as Win81, returns true.
+        /// For Win10.1607+ and Win7/XP, return false.
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsWin81()
+        {
+            // We cannot check Environment.OSVersion.Version for 6.3.xxxx,
+            // bcz it will always give us 6.2.9200 as designed by Microsoft.
+
+            if (s_sigWin81 != -1)
+            {
+                return s_sigWin81 == 1 ? true : false;
+            }
+
+            if (Environment.OSVersion.Version.Major != 6)
+            {
+                s_sigWin81 = 0;
+                return false;
+            }
+
+            try
+            {
+                PROCESS_DPI_AWARENESS procdaw;
+                GetProcessDpiAwareness(Process.GetCurrentProcess().Handle, out procdaw); // Win81 only
+            }
+            catch (Exception)
+            {
+                s_sigWin81 = 0; // win7
+                return false;
+            }
+
+            try
+            {
+                int sysdpi = GetDpiForSystem(); // Win10.1607+ only
+                s_sigWin81 = 0;
+                return false;
+            }
+            catch (Exception)
+            {
+                s_sigWin81 = 1;
+                return true;
+            }
         }
 
         private static int s_win7_system_dpi = 0; // 0 means unset

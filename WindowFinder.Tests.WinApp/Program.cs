@@ -206,6 +206,10 @@ Pass a parameter to set DPI awareness for this process.
 2 : Per-monitor-DPI aware
 
 Note: If DPI awareness has been set via manifest, setting it again on Win81+ will fail with 0x80070005.
+
+On Win81+, this program produces best results when run with Per-monitor-DPI aware(option 2).
+
+Win7 does not implement Per-monitor-DPI aware, so you have to go with option 0 or 1.
 ";
             MessageBox.Show(info, mbtitle,
                 MessageBoxButtons.OK, MessageBoxIcon.Information
