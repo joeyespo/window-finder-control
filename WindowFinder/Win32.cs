@@ -336,6 +336,10 @@ namespace WindowFinder
                 else
                 {
                     is_rtp_accurate = false;
+
+                    // [2021-06-28] Todo:
+                    // Maybe, with the help of DwmGetWindowAttribute(DWMWA_EXTENDED_FRAME_BOUNDS),
+                    // we can get a quite-accurate scale-factor for the target-window.
                 }
             }
 
