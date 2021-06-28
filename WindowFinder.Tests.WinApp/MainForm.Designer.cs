@@ -79,7 +79,7 @@ namespace TestControl
             this.txtWindowRect.Name = "txtWindowRect";
             this.txtWindowRect.ReadOnly = true;
             this.txtWindowRect.Size = new System.Drawing.Size(194, 20);
-            this.txtWindowRect.TabIndex = 11;
+            this.txtWindowRect.TabIndex = 21;
             // 
             // lblWinRect
             // 
@@ -87,7 +87,7 @@ namespace TestControl
             this.lblWinRect.Location = new System.Drawing.Point(8, 148);
             this.lblWinRect.Name = "lblWinRect";
             this.lblWinRect.Size = new System.Drawing.Size(52, 13);
-            this.lblWinRect.TabIndex = 10;
+            this.lblWinRect.TabIndex = 20;
             this.lblWinRect.Text = "WinRect:";
             // 
             // windowFinder
@@ -106,7 +106,7 @@ namespace TestControl
             this.lblWindowHandle.Location = new System.Drawing.Point(8, 60);
             this.lblWindowHandle.Name = "lblWindowHandle";
             this.lblWindowHandle.Size = new System.Drawing.Size(48, 16);
-            this.lblWindowHandle.TabIndex = 2;
+            this.lblWindowHandle.TabIndex = 12;
             this.lblWindowHandle.Text = "H&andle:";
             // 
             // txtWindowHandle
@@ -115,7 +115,7 @@ namespace TestControl
             this.txtWindowHandle.MaxLength = 8;
             this.txtWindowHandle.Name = "txtWindowHandle";
             this.txtWindowHandle.Size = new System.Drawing.Size(72, 20);
-            this.txtWindowHandle.TabIndex = 3;
+            this.txtWindowHandle.TabIndex = 13;
             this.txtWindowHandle.TextChanged += new System.EventHandler(this.txtWindowHandle_TextChanged);
             // 
             // lblWindowText
@@ -123,7 +123,7 @@ namespace TestControl
             this.lblWindowText.Location = new System.Drawing.Point(8, 104);
             this.lblWindowText.Name = "lblWindowText";
             this.lblWindowText.Size = new System.Drawing.Size(48, 16);
-            this.lblWindowText.TabIndex = 6;
+            this.lblWindowText.TabIndex = 16;
             this.lblWindowText.Text = "&Text:";
             // 
             // txtWindowText
@@ -132,14 +132,14 @@ namespace TestControl
             this.txtWindowText.Name = "txtWindowText";
             this.txtWindowText.ReadOnly = true;
             this.txtWindowText.Size = new System.Drawing.Size(194, 20);
-            this.txtWindowText.TabIndex = 7;
+            this.txtWindowText.TabIndex = 17;
             // 
             // lblWindowCharset
             // 
             this.lblWindowCharset.Location = new System.Drawing.Point(8, 126);
             this.lblWindowCharset.Name = "lblWindowCharset";
             this.lblWindowCharset.Size = new System.Drawing.Size(48, 16);
-            this.lblWindowCharset.TabIndex = 8;
+            this.lblWindowCharset.TabIndex = 18;
             this.lblWindowCharset.Text = "C&harset:";
             // 
             // txtWindowCharset
@@ -148,7 +148,7 @@ namespace TestControl
             this.txtWindowCharset.Name = "txtWindowCharset";
             this.txtWindowCharset.ReadOnly = true;
             this.txtWindowCharset.Size = new System.Drawing.Size(194, 20);
-            this.txtWindowCharset.TabIndex = 9;
+            this.txtWindowCharset.TabIndex = 19;
             // 
             // lblFinderTool
             // 
@@ -164,14 +164,14 @@ namespace TestControl
             this.txtWindowClass.Name = "txtWindowClass";
             this.txtWindowClass.ReadOnly = true;
             this.txtWindowClass.Size = new System.Drawing.Size(194, 20);
-            this.txtWindowClass.TabIndex = 5;
+            this.txtWindowClass.TabIndex = 15;
             // 
             // lblWindowClass
             // 
             this.lblWindowClass.Location = new System.Drawing.Point(8, 82);
             this.lblWindowClass.Name = "lblWindowClass";
             this.lblWindowClass.Size = new System.Drawing.Size(48, 16);
-            this.lblWindowClass.TabIndex = 4;
+            this.lblWindowClass.TabIndex = 14;
             this.lblWindowClass.Text = "&Class";
             // 
             // btnClose
@@ -180,7 +180,7 @@ namespace TestControl
             this.btnClose.Location = new System.Drawing.Point(280, 12);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(92, 32);
-            this.btnClose.TabIndex = 1;
+            this.btnClose.TabIndex = 2;
             this.btnClose.Text = "Cl&ose";
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
@@ -191,7 +191,7 @@ namespace TestControl
             this.groupBox1.Location = new System.Drawing.Point(280, 101);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(92, 70);
-            this.groupBox1.TabIndex = 2;
+            this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Highlight by";
             // 
@@ -244,7 +244,7 @@ namespace TestControl
             this.ckbClipboard.Location = new System.Drawing.Point(285, 177);
             this.ckbClipboard.Name = "ckbClipboard";
             this.ckbClipboard.Size = new System.Drawing.Size(80, 17);
-            this.ckbClipboard.TabIndex = 12;
+            this.ckbClipboard.TabIndex = 4;
             this.ckbClipboard.Text = "&Screenshot";
             this.toolTip1.SetToolTip(this.ckbClipboard, "Send to clipboard the screenshot from target window location");
             this.ckbClipboard.UseVisualStyleBackColor = true;
