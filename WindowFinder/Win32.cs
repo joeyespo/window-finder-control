@@ -273,10 +273,11 @@ namespace WindowFinder
         /// </summary>
         /// <param name="hWnd"></param>
         /// <param name="hwndOverlay"></param>
-        /// <returns>Return physical(pixel) coordiante of the target hWnd.</returns>
-        internal static RECT HighlightWindow_Overlaying(IntPtr hWnd, IntPtr hwndOverlay)
+        /// <param name="rtp">Report physical(pixel) coordiante of the target hWnd.</param>
+        /// <returns>Whether the returned rtp is accurate.</returns>
+        internal static bool HighlightWindow_Overlaying(IntPtr hWnd, IntPtr hwndOverlay, out RECT rtp)
         {
-            RECT rtp = new RECT(); // p: physical coordinate, as return value.
+            bool is_rtp_accurate = true; // assume accurate
 
             /* This is unnecessary for Win81 and Win10.1607+
             IntPtr thread_oldctx = IntPtr.Zero;
@@ -319,7 +320,23 @@ namespace WindowFinder
             //
             if (DpiUtilities.IsWin81())
             {
-                // ... todo: Prompt to user that rtv is not exact
+                if (DpiUtilities.IsSelfPermonAware())
+                {
+                    is_rtp_accurate = true;
+                }
+                else if (Screen.AllScreens.Length==1) 
+                {
+                    // only one monitor, and the calling process is non-Permon-aware
+                    int sysdpi = DpiUtilities.Win7_SystemDpi();
+
+                    rtp.DoScale((float)sysdpi/96);
+
+                    is_rtp_accurate = true;
+                }
+                else
+                {
+                    is_rtp_accurate = false;
+                }
             }
 
             //
@@ -347,7 +364,7 @@ namespace WindowFinder
             }
             */
 
-            return rtp;
+            return is_rtp_accurate;
         }
 
         /// <summary>
@@ -445,6 +462,31 @@ namespace WindowFinder
                 return 0;
             else
                 return 1;
+        }
+
+        /// <summary>
+        /// Not used yet.
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <returns></returns>
+        private static bool IsWindowInPrimaryMonitor(IntPtr hwnd)
+        {
+            RECT rt;
+            GetWindowRect(hwnd, out rt);
+
+            IntPtr hdc = Win32.GetDC(IntPtr.Zero);
+            int logixres = Win32.GetDeviceCaps(hdc, Win32.DeviceCap.HORZRES);
+            int logiyres = Win32.GetDeviceCaps(hdc, Win32.DeviceCap.VERTRES);
+            Win32.ReleaseDC(IntPtr.Zero, hdc);
+
+            if (rt.left >= 0 && rt.right <= logixres && rt.top >= 0 && rt.bottom <= logiyres)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -864,6 +906,15 @@ namespace WindowFinder
         public static extern int SetProcessDpiAwareness(PROCESS_DPI_AWARENESS value);
 
         /// <summary>
+        /// This Win81 API is useless here.
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <param name="lpPoint"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll")]
+        public static extern bool LogicalToPhysicalPointForPerMonitorDPI(IntPtr hWnd, out System.Drawing.Point lpPoint);
+
+        /// <summary>
         /// Win7 IsProcessDPIAware().
         /// </summary>
         /// <returns></returns>
@@ -1071,6 +1122,7 @@ namespace WindowFinder
         /// It will not change until user logs off and on.
         /// 
         /// This code works both on "caller is 96dpi" and "caller is System-DPI".
+        /// Should work prior to Win10.1607.
         /// </summary>
         /// <returns></returns>
         public static int Win7_SystemDpi()
@@ -1112,5 +1164,6 @@ namespace WindowFinder
             else
                 return false;
         }
+
     }
 }

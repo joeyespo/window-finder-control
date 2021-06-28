@@ -439,9 +439,12 @@ namespace WindowFinder
                     // the aiming-frame will be brought to front, which is not desired.
                     _aimframe.Show(); 
 
-                    Win32.RECT rtp = Win32.HighlightWindow_Overlaying(hWnd, _aimframe.Handle);
+                    Win32.RECT rtp;
+                    bool accurate = Win32.HighlightWindow_Overlaying(hWnd, _aimframe.Handle, out rtp);
 
-                    _aimframe.SetHint($"{rtp.Width} x {rtp.Height}");
+                    string qm = accurate ? "" : "(?) ";
+
+                    _aimframe.SetHint($"{qm}{rtp.Width} x {rtp.Height}");
                 }
                 else
                 {
