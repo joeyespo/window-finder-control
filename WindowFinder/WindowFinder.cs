@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace WindowFinder
@@ -159,6 +160,16 @@ namespace WindowFinder
         /// </summary>
         private AimingFrame _aimframe;
 
+        /// <summary>
+        /// If true, when user release the mouse button, the screen image on target window location is
+        /// copied to clipboard.
+        /// Note: This feature work only in AimingFrame method.
+        /// For InvertColor method, it is much harder or impractical to know target window location
+        /// in various situations.
+        /// </summary>
+        [Browsable(true)]
+        public bool isCaptureToClipboard { get; set; } = true;
+
         #endregion
 
         #region Event Handler Methods
@@ -223,6 +234,9 @@ namespace WindowFinder
         private int _mousex = -1;
         private int _mousey = -1;
 
+        private Win32.RECT _target_hwnd_screen_rect; // in physical(pixel) coordinates
+        private bool _is_target_rect_accurate;
+
         /// <summary>
         /// Handles the MouseMove event of the picTarget control.
         /// </summary>
@@ -264,6 +278,11 @@ namespace WindowFinder
             Win32.SetCapture(IntPtr.Zero);
 
             _timerCheckKey.Stop();
+
+            if (isCaptureToClipboard && tgwHighlightMethod==HighlightMethod.AimingFrame)
+            {
+                MyCaptureToClipboard();
+            }
         }
 
         private void RetargetMyHwnd()
@@ -315,6 +334,18 @@ namespace WindowFinder
 
             // Highlight valid window
             HighlightValidWindow(hChild1, this.Handle);
+        }
+
+        private void MyCaptureToClipboard()
+        {
+            Win32.RECT rt = _target_hwnd_screen_rect;
+            Bitmap bm = new Bitmap(rt.Width, rt.Height);
+            Graphics g = Graphics.FromImage(bm);
+            g.CompositingQuality = CompositingQuality.HighQuality;
+
+            g.CopyFromScreen(rt.left, rt.top, 0, 0, new Size(rt.Width, rt.Height));
+
+            Clipboard.SetImage(bm);
         }
 
         private void picTarget_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
@@ -445,6 +476,9 @@ namespace WindowFinder
                     string qm = accurate ? "" : "(?) ";
 
                     _aimframe.SetHint($"{qm}{rtp.Width} x {rtp.Height}");
+
+                    _target_hwnd_screen_rect = rtp;
+                    _is_target_rect_accurate = accurate;
                 }
                 else
                 {
