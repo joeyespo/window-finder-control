@@ -442,6 +442,8 @@ namespace WindowFinder
             ToggleWindowHighlight(hWnd);
         }
 
+        private int s_DwmRenderingEnabled = -1;
+
         /// <summary>
         /// If hWnd was highlight-on, turn it off;
         /// If hWnd was highlight-off, turn it on.
@@ -459,6 +461,29 @@ namespace WindowFinder
 
             if (tgwHighlightMethod == HighlightMethod.InvertColor)
             {
+                /*
+                if (targetWindow == IntPtr.Zero)
+                {
+                    // highlight on for new window, new window DWM NcRendering should be turned OFF.
+
+                    if (Win32.IsToplevelWindow(hWnd))
+                    {
+                        s_DwmRenderingEnabled = Win32.DWM_SetNonclientRendering(hWnd, Win32.DWMNCRP_DISABLED);
+                    }
+                }
+                else
+                {
+                    if (Win32.IsToplevelWindow(targetWindow))
+                    {
+                        // highlight off for current highlighting window.
+                        if (s_DwmRenderingEnabled == 0 || s_DwmRenderingEnabled == 1)
+                        {
+                            Win32.DWM_SetNonclientRendering(hWnd, s_DwmRenderingEnabled==1 ? Win32.DWMNCRP_ENABLED : Win32.DWMNCRP_DISABLED);
+                        }
+                    }
+                }
+                */
+
                 Win32.HighlightWindow_InvertColor(hWnd);
             }
             else

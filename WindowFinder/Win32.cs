@@ -611,6 +611,18 @@ namespace WindowFinder
             GetRootOwner = 3
         }
 
+        public static bool IsToplevelWindow(IntPtr hWnd)
+        {
+            if (IsWindow(hWnd) == 0)
+                return false;
+
+            IntPtr hwndRoot = Win32.GetAncestor(hWnd, Win32.GetAncestorFlags.GetRoot);
+            if (hwndRoot == hWnd)
+                return true;
+            else
+                return false;
+        }
+
         [DllImport("user32", EntryPoint = "GetWindowTextLengthA", SetLastError = true, CharSet = CharSet.Ansi,
             ExactSpelling = false, CallingConvention = CallingConvention.Winapi)]
         public static extern int GetWindowTextLengthA(IntPtr hWnd);
@@ -773,8 +785,14 @@ namespace WindowFinder
         public const int MONITOR_DEFAULTTOPRIMARY = 1;
         public const int MONITOR_DEFAULTTONEAREST = 2;
 
+        [DllImport("dwmapi.dll", PreserveSig = true)]
+        static extern int DwmSetWindowAttribute(IntPtr hwnd, DWMWINDOWATTRIBUTE attr, ref int attrValue, int attrSize);
+
         [DllImport("dwmapi.dll")]
         static extern int DwmGetWindowAttribute(IntPtr hwnd, Win32.DWMWINDOWATTRIBUTE dwAttribute, out bool pvAttribute, int cbAttribute);
+
+        [DllImport("dwmapi.dll")]
+        static extern int DwmGetWindowAttribute(IntPtr hwnd, Win32.DWMWINDOWATTRIBUTE dwAttribute, out int pvAttribute, int cbAttribute);
 
         [DllImport("dwmapi.dll")]
         static extern int DwmGetWindowAttribute(IntPtr hwnd, Win32.DWMWINDOWATTRIBUTE dwAttribute, out Win32.RECT pvAttribute, int cbAttribute);
@@ -812,6 +830,34 @@ namespace WindowFinder
             return rt;
         }
 
+        // value of DWMWINDOWATTRIBUTE.NCRenderingPolicy
+        public const int DWMNCRP_USEWINDOWSTYLE = 0;
+        public const int DWMNCRP_DISABLED = 1;
+        public const int DWMNCRP_ENABLED = 2;
+
+        /// <summary>
+        /// Set DWM non-client area rendering on/off.
+        /// With Invert-color method, DWM-NcRendering will be turn off temporarily in order to
+        /// see top-level window's invert-color framing effect.
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <param name="policy"></param>
+        /// <returns>Whether DWM rendering was enabled for hWnd. 1=yes, 0=no, -1=fail .</returns>
+        public static int DWM_SetNonclientRendering(IntPtr hwnd, int policy)
+        {
+            int dwm_enabled = -1;
+            int hr = DwmGetWindowAttribute(hwnd, DWMWINDOWATTRIBUTE.NCRenderingEnabled, 
+                out dwm_enabled, Marshal.SizeOf(typeof(int)));
+            if (hr != 0)
+                return -1;
+
+            hr = DwmSetWindowAttribute(hwnd, DWMWINDOWATTRIBUTE.NCRenderingPolicy, 
+                ref policy, Marshal.SizeOf(typeof(int)));
+            if (hr != 0)
+                return -1;
+
+            return dwm_enabled;
+        }
 
         /// <summary>
         /// Since Win81
