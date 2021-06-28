@@ -22,6 +22,7 @@ namespace TestControl
             InitializeComponent();
 
             this.radiobtnAimingFrame.Checked = true;
+            this.ckbClipboard.Checked = true;
         }
 
         #region Event Handler Methods
@@ -94,6 +95,8 @@ namespace TestControl
             this.windowFinder.tgwHighlightMethod = radiobtnInvertColor.Checked
                 ? WindowFinder.WindowFinder.HighlightMethod.InvertColor
                 : WindowFinder.WindowFinder.HighlightMethod.AimingFrame;
+
+            RefreshUIByCfg();
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
@@ -136,5 +139,37 @@ namespace TestControl
         {
             Program.ShowParameterHelp();
         }
+
+        private void RefreshUIByCfg()
+        {
+            if (this.windowFinder.tgwHighlightMethod == WindowFinder.WindowFinder.HighlightMethod.AimingFrame)
+            {
+                this.radiobtnAimingFrame.Checked = true;
+
+                ckbClipboard.Enabled = true;
+
+                if (this.windowFinder.isCaptureToClipboard)
+                    ckbClipboard.Checked = true;
+                else
+                    ckbClipboard.Checked = false;
+
+            }
+            else
+            {
+                this.radiobtnInvertColor.Checked = true;
+
+                ckbClipboard.Enabled = false;
+                ckbClipboard.Checked = false;
+            }
+
+        }
+
+        private void ckbClipboard_MouseClick(object sender, MouseEventArgs e)
+        {
+            this.windowFinder.isCaptureToClipboard = !this.windowFinder.isCaptureToClipboard;
+
+            RefreshUIByCfg();
+        }
+
     }
 }

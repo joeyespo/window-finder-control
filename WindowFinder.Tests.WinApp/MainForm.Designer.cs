@@ -45,6 +45,7 @@ namespace TestControl
             this.radiobtnInvertColor = new System.Windows.Forms.RadioButton();
             this.lblDpiAwareness = new System.Windows.Forms.Label();
             this.btnHelp = new System.Windows.Forms.Button();
+            this.ckbClipboard = new System.Windows.Forms.CheckBox();
             this.gpbTrayMe.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -89,6 +90,7 @@ namespace TestControl
             // 
             // windowFinder
             // 
+            this.windowFinder.isCaptureToClipboard = true;
             this.windowFinder.isFindOnlyTopLevel = false;
             this.windowFinder.Location = new System.Drawing.Point(100, 20);
             this.windowFinder.Name = "windowFinder";
@@ -184,7 +186,7 @@ namespace TestControl
             // 
             this.groupBox1.Controls.Add(this.radiobtnAimingFrame);
             this.groupBox1.Controls.Add(this.radiobtnInvertColor);
-            this.groupBox1.Location = new System.Drawing.Point(280, 130);
+            this.groupBox1.Location = new System.Drawing.Point(280, 101);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(92, 70);
             this.groupBox1.TabIndex = 2;
@@ -233,11 +235,24 @@ namespace TestControl
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
             // 
+            // ckbClipboard
+            // 
+            this.ckbClipboard.AutoCheck = false;
+            this.ckbClipboard.AutoSize = true;
+            this.ckbClipboard.Location = new System.Drawing.Point(285, 177);
+            this.ckbClipboard.Name = "ckbClipboard";
+            this.ckbClipboard.Size = new System.Drawing.Size(85, 17);
+            this.ckbClipboard.TabIndex = 12;
+            this.ckbClipboard.Text = "To clipboar&d";
+            this.ckbClipboard.UseVisualStyleBackColor = true;
+            this.ckbClipboard.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ckbClipboard_MouseClick);
+            // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.btnClose;
             this.ClientSize = new System.Drawing.Size(380, 207);
+            this.Controls.Add(this.ckbClipboard);
             this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.lblDpiAwareness);
             this.Controls.Add(this.groupBox1);
@@ -281,5 +296,6 @@ namespace TestControl
         private System.Windows.Forms.TextBox txtWindowRect;
         private System.Windows.Forms.Label lblWinRect;
         private System.Windows.Forms.Button btnHelp;
+        private System.Windows.Forms.CheckBox ckbClipboard;
     }
 }
