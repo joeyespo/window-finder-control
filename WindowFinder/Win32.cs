@@ -498,33 +498,6 @@ namespace WindowFinder
             }
         }
 
-        /// <summary>
-        /// Determines whether the two windows are related.
-        /// </summary>
-        internal static bool IsRelativeWindow(IntPtr hWnd, IntPtr hRelativeWindow, bool bProcessAncestor)
-        {
-            uint dwProcess = new int(), dwProcessOwner = new int();
-            uint dwThread = new int(), dwThreadOwner = new int();
-            ;
-
-            // Failsafe
-            if (hWnd == IntPtr.Zero)
-                return false;
-            if (hRelativeWindow == IntPtr.Zero)
-                return false;
-            if (hWnd == hRelativeWindow)
-                return true;
-
-            // Get processes and threads
-            dwThread = GetWindowThreadProcessId(hWnd, out dwProcess);
-            dwThreadOwner = GetWindowThreadProcessId(hRelativeWindow, out dwProcessOwner);
-
-            // Get relative info
-            if (bProcessAncestor)
-                return (dwProcess == dwProcessOwner);
-            return (dwThread == dwThreadOwner);
-        }
-
         private static int s_isAboveWin10_1607 = -1;
 
         //

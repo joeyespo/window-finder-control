@@ -23,6 +23,9 @@ namespace TestControl
 
             this.radiobtnAimingFrame.Checked = true;
 
+            ckbMyThread.CheckFromCode(true);
+            ckbMyProcess.CheckFromCode(true);
+
             ckbScreenshot.CheckFromCode(true);
         }
 
@@ -143,6 +146,23 @@ namespace TestControl
 
         private void RefreshUIByCfg()
         {
+            if (this.windowFinder.isIncludeMyProcess)
+            {
+                ckbMyProcess.CheckFromCode(true);
+
+                ckbMyThread.Enabled = true;
+                ckbMyThread.CheckFromCode(this.windowFinder.isIncludeMyThread);
+            }
+            else
+            {
+                ckbMyProcess.CheckFromCode(false);
+
+                ckbMyThread.Enabled = false;
+                ckbMyThread.CheckFromCode(false);
+            }
+
+            //
+
             if (this.windowFinder.tgwHighlightMethod == WindowFinder.WindowFinder.HighlightMethod.AimingFrame)
             {
                 this.radiobtnAimingFrame.Checked = true;
@@ -164,15 +184,26 @@ namespace TestControl
             }
         }
 
-        private void ckbClipboard_CheckedChanged(object sender, EventArgs e)
+        private void ckbMyThread_CheckedChanged_ByHuman(object sender, EventArgs e)
         {
-            this.windowFinder.isDoScreenshot = !this.windowFinder.isDoScreenshot;
-
-            Debug.WriteLine($"isDoScreenshot={this.windowFinder.isDoScreenshot}");
+            this.windowFinder.isIncludeMyThread = ckbMyThread.Checked;
 
             RefreshUIByCfg();
         }
 
+        private void ckbMyProcess_CheckedChanged_ByHuman(object sender, EventArgs e)
+        {
+            this.windowFinder.isIncludeMyProcess = ckbMyProcess.Checked;
+
+            RefreshUIByCfg();
+        }
+
+        private void ckbScreenshot_CheckedChanged_ByHuman(object sender, EventArgs e)
+        {
+            this.windowFinder.isDoScreenshot = ckbScreenshot.Checked;
+
+            RefreshUIByCfg();
+        }
     }
 
     public class MyCheckBox : CheckBox
@@ -208,7 +239,8 @@ namespace TestControl
             if (_isCheckFromCode)
                 return;
 
-            CheckedChanged_ByHuman(sender, e);
+            if(CheckedChanged_ByHuman!=null)
+                CheckedChanged_ByHuman(sender, e);
         }
     }
 }

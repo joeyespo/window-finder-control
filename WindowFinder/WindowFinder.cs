@@ -170,6 +170,16 @@ namespace WindowFinder
         [Browsable(true)]
         public bool isDoScreenshot { get; set; } = true;
 
+        [Browsable(true)]
+        public bool isIncludeMyProcess { get; set; } = true;
+
+        /// <summary>
+        /// If isIncludeMyProcess=false, then isIncludeMyThread is effectively *false* -- even if
+        /// isIncludeMyThread's value is still true.
+        /// </summary>
+        [Browsable(true)]
+        public bool isIncludeMyThread { get; set; } = true;
+
         #endregion
 
         #region Event Handler Methods
@@ -179,7 +189,7 @@ namespace WindowFinder
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        private void WindowFinder_Load(object sender, System.EventArgs e)
+        private void WindowFinder_Load(object sender, EventArgs e)
         {
             this.Size = picTarget.Size;
             try
@@ -209,7 +219,7 @@ namespace WindowFinder
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance containing the event data.</param>
-        private void picTarget_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void picTarget_MouseDown(object sender, MouseEventArgs e)
         {
             // Set capture image and cursor
             picTarget.Image = bitmapFinda;
@@ -242,7 +252,7 @@ namespace WindowFinder
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance containing the event data.</param>
-        private void picTarget_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void picTarget_MouseMove(object sender, MouseEventArgs e)
         {
             // Make sure targeting before highlighting windows
             if(!isTargeting)
@@ -259,7 +269,7 @@ namespace WindowFinder
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance containing the event data.</param>
-        private void picTarget_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void picTarget_MouseUp(object sender, MouseEventArgs e)
         {
             // End targeting
             isTargeting = false;
@@ -287,7 +297,7 @@ namespace WindowFinder
 
         private void RetargetMyHwnd()
         {
-            System.Drawing.Point pt = new Point(_mousex, _mousey);
+            Point pt = new Point(_mousex, _mousey);
 
             Win32.ClientToScreen(picTarget.Handle, ref pt);
 
@@ -348,7 +358,7 @@ namespace WindowFinder
             Clipboard.SetImage(bm);
         }
 
-        private void picTarget_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+        private void picTarget_KeyDown(object sender, KeyEventArgs e)
         {
             // Chj: This cannot be triggered! Why?
 
@@ -359,7 +369,7 @@ namespace WindowFinder
             }
         }
 
-        private void picTarget_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
+        private void picTarget_KeyUp(object sender, KeyEventArgs e)
         {
             Debug.WriteLine($"picTarget_KeyUp({e.KeyCode})...");
             if (e.KeyCode == Keys.Control)
@@ -378,7 +388,7 @@ namespace WindowFinder
         /// <param name="handle">The handle to set to.</param>
         public void SetWindowHandle(IntPtr handle)
         {
-            if((Win32.IsWindow(handle) == 0) || (Win32.IsRelativeWindow(handle, this.Handle, true)))
+            if((Win32.IsWindow(handle) == 0) || !IsIncludeWindow(handle, this.Handle))
             {
                 // Clear window information
                 windowHandle = IntPtr.Zero;
@@ -413,6 +423,44 @@ namespace WindowFinder
         #region Helper Methods
 
         /// <summary>
+        /// Determine whether hwndOther should be *included* as a finding target.
+        /// Implicit input: this.isIncludeMyThread, this.isIncludeMyProcess .
+        /// </summary>
+        /// <param name="hwndOther">the HWND currently under mouse pointer.</param>
+        /// <param name="hwndMy">the HWND from the calling thread.</param>
+        /// <returns></returns>
+        private bool IsIncludeWindow(IntPtr hwndOther, IntPtr hwndMy)
+        {
+            uint dwProcess, dwProcessOther;
+            uint dwThread, dwThreadOther;
+
+            // Failsafe
+            if (hwndMy == IntPtr.Zero)
+                return false;
+            if (hwndMy == IntPtr.Zero)
+                return false;
+            if (hwndMy == hwndOther)
+                return false;
+
+            bool effective_include_my_thread = isIncludeMyThread;
+            //
+            if (isIncludeMyProcess == false)
+                effective_include_my_thread = false; // gets overridden
+
+            if (effective_include_my_thread)
+                return true;
+
+            // Get process-id and thread-id
+            dwThread = Win32.GetWindowThreadProcessId(hwndMy, out dwProcess);
+            dwThreadOther = Win32.GetWindowThreadProcessId(hwndOther, out dwProcessOther);
+
+            if (isIncludeMyProcess)
+                return (dwThread == dwThreadOther) ? false : true;
+            else 
+                return (dwProcess == dwProcessOther) ? false : true;
+        }
+
+        /// <summary>
         /// Highlights the specified window, but only if
         ///  ..... it is a valid window in relation to the specified owner window. TODO: comment fix
         /// Previous highlight(of an old window) is turned off at the same time.
@@ -423,8 +471,8 @@ namespace WindowFinder
             if(targetWindow == hWnd)
                 return;
 
-            // Check for relative
-            if(Win32.IsRelativeWindow(hWnd, hOwner, true))
+            // Check for inclusion
+            if(!IsIncludeWindow(hWnd, hOwner))
             {
                 // Unhighlight last window
                 if(targetWindow != IntPtr.Zero)

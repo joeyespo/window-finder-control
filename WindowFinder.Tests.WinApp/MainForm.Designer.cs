@@ -46,10 +46,14 @@ namespace TestControl
             this.radiobtnInvertColor = new System.Windows.Forms.RadioButton();
             this.lblDpiAwareness = new System.Windows.Forms.Label();
             this.btnHelp = new System.Windows.Forms.Button();
-            this.ckbScreenshot = new MyCheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.ckbScreenshot = new TestControl.MyCheckBox();
+            this.ckbMyThread = new TestControl.MyCheckBox();
+            this.ckbMyProcess = new TestControl.MyCheckBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.gpbTrayMe.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // gpbTrayMe
@@ -94,6 +98,8 @@ namespace TestControl
             // 
             this.windowFinder.isDoScreenshot = true;
             this.windowFinder.isFindOnlyTopLevel = false;
+            this.windowFinder.isIncludeMyProcess = true;
+            this.windowFinder.isIncludeMyThread = true;
             this.windowFinder.Location = new System.Drawing.Point(100, 20);
             this.windowFinder.Name = "windowFinder";
             this.windowFinder.Size = new System.Drawing.Size(31, 28);
@@ -188,9 +194,9 @@ namespace TestControl
             // 
             this.groupBox1.Controls.Add(this.radiobtnAimingFrame);
             this.groupBox1.Controls.Add(this.radiobtnInvertColor);
-            this.groupBox1.Location = new System.Drawing.Point(280, 101);
+            this.groupBox1.Location = new System.Drawing.Point(280, 120);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(92, 70);
+            this.groupBox1.Size = new System.Drawing.Size(92, 54);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Highlight by";
@@ -198,7 +204,7 @@ namespace TestControl
             // radiobtnAimingFrame
             // 
             this.radiobtnAimingFrame.AutoSize = true;
-            this.radiobtnAimingFrame.Location = new System.Drawing.Point(5, 41);
+            this.radiobtnAimingFrame.Location = new System.Drawing.Point(5, 34);
             this.radiobtnAimingFrame.Name = "radiobtnAimingFrame";
             this.radiobtnAimingFrame.Size = new System.Drawing.Size(85, 17);
             this.radiobtnAimingFrame.TabIndex = 9;
@@ -208,7 +214,7 @@ namespace TestControl
             // radiobtnInvertColor
             // 
             this.radiobtnInvertColor.AutoSize = true;
-            this.radiobtnInvertColor.Location = new System.Drawing.Point(5, 22);
+            this.radiobtnInvertColor.Location = new System.Drawing.Point(5, 15);
             this.radiobtnInvertColor.Name = "radiobtnInvertColor";
             this.radiobtnInvertColor.Size = new System.Drawing.Size(78, 17);
             this.radiobtnInvertColor.TabIndex = 8;
@@ -240,20 +246,56 @@ namespace TestControl
             // ckbScreenshot
             // 
             this.ckbScreenshot.AutoSize = true;
-            this.ckbScreenshot.Location = new System.Drawing.Point(285, 177);
+            this.ckbScreenshot.Location = new System.Drawing.Point(285, 180);
             this.ckbScreenshot.Name = "ckbScreenshot";
             this.ckbScreenshot.Size = new System.Drawing.Size(80, 17);
             this.ckbScreenshot.TabIndex = 4;
             this.ckbScreenshot.Text = "&Screenshot";
             this.toolTip1.SetToolTip(this.ckbScreenshot, "Send to clipboard the screenshot from target window location");
             this.ckbScreenshot.UseVisualStyleBackColor = true;
-            this.ckbScreenshot.CheckedChanged_ByHuman += new System.EventHandler(this.ckbClipboard_CheckedChanged);
+            this.ckbScreenshot.CheckedChanged_ByHuman += new System.EventHandler(this.ckbScreenshot_CheckedChanged_ByHuman);
+            // 
+            // ckbMyProcess
+            // 
+            this.ckbMyProcess.AutoSize = true;
+            this.ckbMyProcess.Location = new System.Drawing.Point(6, 16);
+            this.ckbMyProcess.Name = "ckbMyProcess";
+            this.ckbMyProcess.Size = new System.Drawing.Size(80, 17);
+            this.ckbMyProcess.TabIndex = 12;
+            this.ckbMyProcess.Text = "My process";
+            this.toolTip1.SetToolTip(this.ckbMyProcess, "Find windows/controls from the same process of this program.");
+            this.ckbMyProcess.UseVisualStyleBackColor = true;
+            this.ckbMyProcess.CheckedChanged_ByHuman += new System.EventHandler(this.ckbMyProcess_CheckedChanged_ByHuman);
+            // 
+            // ckbMyThread
+            // 
+            this.ckbMyThread.AutoSize = true;
+            this.ckbMyThread.Location = new System.Drawing.Point(6, 34);
+            this.ckbMyThread.Name = "ckbMyThread";
+            this.ckbMyThread.Size = new System.Drawing.Size(73, 17);
+            this.ckbMyThread.TabIndex = 13;
+            this.ckbMyThread.Text = "My thread";
+            this.toolTip1.SetToolTip(this.ckbMyThread, "Find windows/controls from the same thread by the calling code.");
+            this.ckbMyThread.UseVisualStyleBackColor = true;
+            this.ckbMyThread.CheckedChanged_ByHuman += new System.EventHandler(this.ckbMyThread_CheckedChanged_ByHuman);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.ckbMyProcess);
+            this.groupBox2.Controls.Add(this.ckbMyThread);
+            this.groupBox2.Location = new System.Drawing.Point(280, 60);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(92, 54);
+            this.groupBox2.TabIndex = 10;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Include";
             // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.btnClose;
             this.ClientSize = new System.Drawing.Size(380, 207);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.ckbScreenshot);
             this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.lblDpiAwareness);
@@ -268,6 +310,8 @@ namespace TestControl
             this.gpbTrayMe.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -296,5 +340,8 @@ namespace TestControl
         private MyCheckBox ckbScreenshot;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.ComponentModel.IContainer components;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private MyCheckBox ckbMyProcess;
+        private MyCheckBox ckbMyThread;
     }
 }

@@ -1,3 +1,8 @@
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+
 namespace WindowFinder
 {
     partial class WindowFinder
@@ -23,29 +28,29 @@ namespace WindowFinder
         /// </summary>
         private void InitializeComponent()
         {
-            this.picTarget = new System.Windows.Forms.PictureBox();
+            this.picTarget = new PictureBox();
             this.SuspendLayout();
             // 
             // picTarget
             // 
-            this.picTarget.BackColor = System.Drawing.Color.White;
+            this.picTarget.BackColor = Color.White;
             this.picTarget.Name = "picTarget";
-            this.picTarget.Size = new System.Drawing.Size(92, 104);
+            this.picTarget.Size = new Size(92, 104);
             this.picTarget.TabIndex = 0;
             this.picTarget.TabStop = false;
-            this.picTarget.MouseUp += new System.Windows.Forms.MouseEventHandler(this.picTarget_MouseUp);
-            this.picTarget.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picTarget_MouseMove);
-            this.picTarget.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picTarget_MouseDown);
+            this.picTarget.MouseUp += new MouseEventHandler(this.picTarget_MouseUp);
+            this.picTarget.MouseMove += new MouseEventHandler(this.picTarget_MouseMove);
+            this.picTarget.MouseDown += new MouseEventHandler(this.picTarget_MouseDown);
             this.picTarget.KeyDown += picTarget_KeyDown;
             this.picTarget.KeyUp += picTarget_KeyUp;
             // 
             // WindowFinder
             // 
-            this.Controls.AddRange(new System.Windows.Forms.Control[] {
+            this.Controls.AddRange(new Control[] {
                                                                   this.picTarget});
             this.Name = "WindowFinder";
-            this.Size = new System.Drawing.Size(272, 216);
-            this.Load += new System.EventHandler(this.WindowFinder_Load);
+            this.Size = new Size(272, 216);
+            this.Load += new EventHandler(this.WindowFinder_Load);
             this.ResumeLayout(false);
 
         }
@@ -55,7 +60,7 @@ namespace WindowFinder
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components;
-        private System.Windows.Forms.PictureBox picTarget;
+        private IContainer components;
+        private PictureBox picTarget;
     }
 }
