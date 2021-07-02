@@ -23,7 +23,7 @@ namespace TestControl
 
             this.radiobtnAimingFrame.Checked = true;
 
-            ckb_CheckFromCode(ckbScreenshot, true);
+            ckbScreenshot.CheckFromCode(true);
         }
 
         #region Event Handler Methods
@@ -150,9 +150,9 @@ namespace TestControl
                 ckbScreenshot.Enabled = true;
 
                 if (this.windowFinder.isCaptureToClipboard)
-                    ckb_CheckFromCode(ckbScreenshot, true);
+                    ckbScreenshot.CheckFromCode(true);
                 else
-                    ckb_CheckFromCode(ckbScreenshot, false);
+                    ckbScreenshot.CheckFromCode(false);
             }
             else
             {
@@ -160,19 +160,12 @@ namespace TestControl
 
                 ckbScreenshot.Enabled = false;
 
-                ckb_CheckFromCode(ckbScreenshot, false);
+                ckbScreenshot.CheckFromCode(false);
             }
-        }
-
-        private void ckbClipboard_MouseClick(object sender, MouseEventArgs e)
-        {
         }
 
         private void ckbClipboard_CheckedChanged(object sender, EventArgs e)
         {
-            if (ckb_IsCheckingFromCode(ckbScreenshot))
-                return; // Avoid recursive call
-
             this.windowFinder.isCaptureToClipboard = !this.windowFinder.isCaptureToClipboard;
 
             Debug.WriteLine($"isCaptureToClipboard={this.windowFinder.isCaptureToClipboard}");
@@ -180,21 +173,42 @@ namespace TestControl
             RefreshUIByCfg();
         }
 
-        static void ckb_CheckFromCode(CheckBox ckb, bool isChecked)
+    }
+
+    public class MyCheckBox : CheckBox
+    {
+        public MyCheckBox()
         {
-            ckb.Tag = "fromcode";
-
-            ckb.Checked = isChecked;
-
-            ckb.Tag = null;
+            this.CheckedChanged += MyCheckedChanged;
         }
 
-        static bool ckb_IsCheckingFromCode(CheckBox ckb)
+        private bool _isCheckFromCode = false;
+
+        public event EventHandler CheckedChanged_ByHuman;
+
+        public void CheckFromCode(bool isChecked)
         {
-            if (ckb.Tag == null)
-                return false;
-            else
+            _isCheckFromCode = true;
+
+            this.Checked = isChecked;
+
+            _isCheckFromCode = false;
+        }
+
+        public bool IsCheckingFromCode()
+        {
+            if (_isCheckFromCode)
                 return true;
+            else
+                return false;
+        }
+
+        private void MyCheckedChanged(object sender, EventArgs e)
+        {
+            if (_isCheckFromCode)
+                return;
+
+            CheckedChanged_ByHuman(sender, e);
         }
     }
 }

@@ -46,7 +46,7 @@ namespace TestControl
             this.radiobtnInvertColor = new System.Windows.Forms.RadioButton();
             this.lblDpiAwareness = new System.Windows.Forms.Label();
             this.btnHelp = new System.Windows.Forms.Button();
-            this.ckbScreenshot = new System.Windows.Forms.CheckBox();
+            this.ckbScreenshot = new MyCheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.gpbTrayMe.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -247,8 +247,7 @@ namespace TestControl
             this.ckbScreenshot.Text = "&Screenshot";
             this.toolTip1.SetToolTip(this.ckbScreenshot, "Send to clipboard the screenshot from target window location");
             this.ckbScreenshot.UseVisualStyleBackColor = true;
-            this.ckbScreenshot.CheckedChanged += new System.EventHandler(this.ckbClipboard_CheckedChanged);
-            this.ckbScreenshot.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ckbClipboard_MouseClick);
+            this.ckbScreenshot.CheckedChanged_ByHuman += new System.EventHandler(this.ckbClipboard_CheckedChanged);
             // 
             // MainForm
             // 
@@ -294,7 +293,7 @@ namespace TestControl
         private System.Windows.Forms.TextBox txtWindowRect;
         private System.Windows.Forms.Label lblWinRect;
         private System.Windows.Forms.Button btnHelp;
-        private System.Windows.Forms.CheckBox ckbScreenshot;
+        private MyCheckBox ckbScreenshot;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.ComponentModel.IContainer components;
     }
