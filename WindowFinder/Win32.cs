@@ -372,12 +372,13 @@ namespace WindowFinder
         }
 
         /// <summary>
-        /// This function deals with a hard problem on a Win7 with System DPI set to non-100% (assume 150%).
+        /// This function deals with a hard problem on Win7 with System DPI set to non-100%
+        /// (assume 150% below).
         /// If we (window-finder code) gets a width of 400 from GetWindowRect(hwnd0),
         /// also assuming we are DPI-unaware program, then we are actually facing TWO cases:
         ///  1. The hwnd0 is also DPI-unaware, and it is actually occupying 400*1.5=600 physical pixels.
         ///  2. The hwnd0 is Sysdpi-aware, so it is occupying exactly 400 physical pixels.
-        /// Then how do we distinguish between the TWO cases? Windows 7 does not give up out-of-box
+        /// Then how do we distinguish between the TWO cases? Windows 7 does not give us out-of-box
         /// API call to distinguish them, so we need to circumvent it brilliantly.
         /// 
         /// This happens similarly as well if we are a System-DPI-awareness program.
@@ -387,8 +388,12 @@ namespace WindowFinder
         /// we can finally distinguish the TWO cases.
         /// 
         /// </summary>
-        /// <param name="hwnd0"></param>
-        /// <param name="winrect"></param>
+        /// <param name="hwnd0">the rect0 input is "about" this HWND</param>
+        /// <param name="rect0">
+        ///  * On input, the preliminary dimension of hwnd0; caller's GetWindowRect() reports this.
+        ///  * On output, the dimension of hwnd1 so that the caller calls SetWindowPos(hwnd1, ...) 
+        ///    will place hwnd1 at exactly the same location as hwnd0.
+        /// </param>
         /// <returns>Physical coornidates of hwnd0's Rect.</returns>
         private static RECT Win7_SpecialAdjust(IntPtr hwnd0, ref RECT rect0)
         {
