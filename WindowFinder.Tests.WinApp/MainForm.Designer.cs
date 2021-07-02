@@ -47,10 +47,10 @@ namespace TestControl
             this.lblDpiAwareness = new System.Windows.Forms.Label();
             this.btnHelp = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.ckbScreenshot = new TestControl.MyCheckBox();
-            this.ckbMyThread = new TestControl.MyCheckBox();
-            this.ckbMyProcess = new TestControl.MyCheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.ckbMyProcess = new TestControl.MyCheckBox();
+            this.ckbMyThread = new TestControl.MyCheckBox();
+            this.ckbScreenshot = new TestControl.MyCheckBox();
             this.gpbTrayMe.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -209,6 +209,8 @@ namespace TestControl
             this.radiobtnAimingFrame.Size = new System.Drawing.Size(85, 17);
             this.radiobtnAimingFrame.TabIndex = 9;
             this.radiobtnAimingFrame.Text = "&Aiming frame";
+            this.toolTip1.SetToolTip(this.radiobtnAimingFrame, "Overlay a (red) aiming-frame window on the target window, and keep the former sam" +
+        "e-size as latter.\r\nThis works well regardless of DWM-rendering.");
             this.radiobtnAimingFrame.UseVisualStyleBackColor = true;
             // 
             // radiobtnInvertColor
@@ -220,6 +222,8 @@ namespace TestControl
             this.radiobtnInvertColor.TabIndex = 8;
             this.radiobtnInvertColor.TabStop = true;
             this.radiobtnInvertColor.Text = "&Invert color";
+            this.toolTip1.SetToolTip(this.radiobtnInvertColor, "WinXP era highlight method, drawing an invert-colored frame around target window." +
+        " \r\nIt loses visual effect with DWM-rendered top-level window since Vista.");
             this.radiobtnInvertColor.UseVisualStyleBackColor = true;
             this.radiobtnInvertColor.CheckedChanged += new System.EventHandler(this.radiobtnInvertColor_CheckedChanged);
             // 
@@ -243,17 +247,16 @@ namespace TestControl
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
             // 
-            // ckbScreenshot
+            // groupBox2
             // 
-            this.ckbScreenshot.AutoSize = true;
-            this.ckbScreenshot.Location = new System.Drawing.Point(285, 180);
-            this.ckbScreenshot.Name = "ckbScreenshot";
-            this.ckbScreenshot.Size = new System.Drawing.Size(80, 17);
-            this.ckbScreenshot.TabIndex = 4;
-            this.ckbScreenshot.Text = "&Screenshot";
-            this.toolTip1.SetToolTip(this.ckbScreenshot, "Send to clipboard the screenshot from target window location");
-            this.ckbScreenshot.UseVisualStyleBackColor = true;
-            this.ckbScreenshot.CheckedChanged_ByHuman += new System.EventHandler(this.ckbScreenshot_CheckedChanged_ByHuman);
+            this.groupBox2.Controls.Add(this.ckbMyProcess);
+            this.groupBox2.Controls.Add(this.ckbMyThread);
+            this.groupBox2.Location = new System.Drawing.Point(280, 60);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(92, 54);
+            this.groupBox2.TabIndex = 10;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Include";
             // 
             // ckbMyProcess
             // 
@@ -279,16 +282,17 @@ namespace TestControl
             this.ckbMyThread.UseVisualStyleBackColor = true;
             this.ckbMyThread.CheckedChanged_ByHuman += new System.EventHandler(this.ckbMyThread_CheckedChanged_ByHuman);
             // 
-            // groupBox2
+            // ckbScreenshot
             // 
-            this.groupBox2.Controls.Add(this.ckbMyProcess);
-            this.groupBox2.Controls.Add(this.ckbMyThread);
-            this.groupBox2.Location = new System.Drawing.Point(280, 60);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(92, 54);
-            this.groupBox2.TabIndex = 10;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Include";
+            this.ckbScreenshot.AutoSize = true;
+            this.ckbScreenshot.Location = new System.Drawing.Point(285, 180);
+            this.ckbScreenshot.Name = "ckbScreenshot";
+            this.ckbScreenshot.Size = new System.Drawing.Size(80, 17);
+            this.ckbScreenshot.TabIndex = 4;
+            this.ckbScreenshot.Text = "&Screenshot";
+            this.toolTip1.SetToolTip(this.ckbScreenshot, "Send to clipboard the screenshot from target window location");
+            this.ckbScreenshot.UseVisualStyleBackColor = true;
+            this.ckbScreenshot.CheckedChanged_ByHuman += new System.EventHandler(this.ckbScreenshot_CheckedChanged_ByHuman);
             // 
             // MainForm
             // 
