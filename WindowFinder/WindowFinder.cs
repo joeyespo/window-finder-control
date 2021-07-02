@@ -461,8 +461,8 @@ namespace WindowFinder
         }
 
         /// <summary>
-        /// Highlights the specified window, but only if
-        ///  ..... it is a valid window in relation to the specified owner window. TODO: comment fix
+        /// Highlights the target window, and the API user can control whether
+        /// a window/control from the calling thread/process is consider a valid target.
         /// Previous highlight(of an old window) is turned off at the same time.
         /// </summary>
         private void HighlightValidWindow(IntPtr hWnd, IntPtr hOwner)
@@ -490,7 +490,7 @@ namespace WindowFinder
             ToggleWindowHighlight(hWnd);
         }
 
-        private int s_DwmRenderingEnabled = -1;
+//      private int s_DwmRenderingEnabled = -1;
 
         /// <summary>
         /// If hWnd was highlight-on, turn it off;
