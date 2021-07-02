@@ -239,7 +239,6 @@ namespace TestControl
             // 
             // ckbClipboard
             // 
-            this.ckbClipboard.AutoCheck = false;
             this.ckbClipboard.AutoSize = true;
             this.ckbClipboard.Location = new System.Drawing.Point(285, 177);
             this.ckbClipboard.Name = "ckbClipboard";
@@ -248,6 +247,7 @@ namespace TestControl
             this.ckbClipboard.Text = "&Screenshot";
             this.toolTip1.SetToolTip(this.ckbClipboard, "Send to clipboard the screenshot from target window location");
             this.ckbClipboard.UseVisualStyleBackColor = true;
+            this.ckbClipboard.CheckedChanged += new System.EventHandler(this.ckbClipboard_CheckedChanged);
             this.ckbClipboard.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ckbClipboard_MouseClick);
             // 
             // MainForm

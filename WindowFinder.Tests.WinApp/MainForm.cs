@@ -22,7 +22,8 @@ namespace TestControl
             InitializeComponent();
 
             this.radiobtnAimingFrame.Checked = true;
-            this.ckbClipboard.Checked = true;
+
+            ckb_CheckFromCode(ckbClipboard, true);
         }
 
         #region Event Handler Methods
@@ -149,27 +150,51 @@ namespace TestControl
                 ckbClipboard.Enabled = true;
 
                 if (this.windowFinder.isCaptureToClipboard)
-                    ckbClipboard.Checked = true;
+                    ckb_CheckFromCode(ckbClipboard, true);
                 else
-                    ckbClipboard.Checked = false;
-
+                    ckb_CheckFromCode(ckbClipboard, false);
             }
             else
             {
                 this.radiobtnInvertColor.Checked = true;
 
                 ckbClipboard.Enabled = false;
-                ckbClipboard.Checked = false;
-            }
 
+                ckb_CheckFromCode(ckbClipboard, false);
+            }
         }
 
         private void ckbClipboard_MouseClick(object sender, MouseEventArgs e)
         {
+        }
+
+        private void ckbClipboard_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ckb_IsCheckingFromCode(ckbClipboard))
+                return; // Avoid recursive call
+
             this.windowFinder.isCaptureToClipboard = !this.windowFinder.isCaptureToClipboard;
+
+            Debug.WriteLine($"isCaptureToClipboard={this.windowFinder.isCaptureToClipboard}");
 
             RefreshUIByCfg();
         }
 
+        static void ckb_CheckFromCode(CheckBox ckb, bool isChecked)
+        {
+            ckb.Tag = "fromcode";
+
+            ckb.Checked = isChecked;
+
+            ckb.Tag = null;
+        }
+
+        static bool ckb_IsCheckingFromCode(CheckBox ckb)
+        {
+            if (ckb.Tag == null)
+                return false;
+            else
+                return true;
+        }
     }
 }
