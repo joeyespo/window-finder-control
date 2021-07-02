@@ -295,6 +295,15 @@ namespace WindowFinder
             }
         }
 
+        private bool IsFromAimingFrame(IntPtr hwnd)
+        {
+            IntPtr hwndToplevel = Win32.GetAncestor(hwnd, Win32.GetAncestorFlags.GetRoot);
+            if (hwndToplevel == _aimframe.Handle)
+                return true;
+            else
+                return false;
+        }
+
         private void RetargetMyHwnd()
         {
             Point pt = new Point(_mousex, _mousey);
@@ -304,6 +313,9 @@ namespace WindowFinder
             // Get screen coords from client coords and window handle
             IntPtr hChild1 = Win32.WindowFromPoint(IntPtr.Zero, pt.X, pt.Y);
             // -- We name it "child" bcz it must be a child-or-grand-child of the Desktop window.
+
+            if (IsFromAimingFrame(hChild1))
+                return;
 
             // Get real window
             if (hChild1 != IntPtr.Zero)
