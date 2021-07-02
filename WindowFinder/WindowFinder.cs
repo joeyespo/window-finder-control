@@ -168,7 +168,7 @@ namespace WindowFinder
         /// in various situations.
         /// </summary>
         [Browsable(true)]
-        public bool isCaptureToClipboard { get; set; } = true;
+        public bool isDoScreenshot { get; set; } = true;
 
         #endregion
 
@@ -279,7 +279,7 @@ namespace WindowFinder
 
             _timerCheckKey.Stop();
 
-            if (isCaptureToClipboard && tgwHighlightMethod==HighlightMethod.AimingFrame)
+            if (isDoScreenshot && tgwHighlightMethod==HighlightMethod.AimingFrame)
             {
                 MyCaptureToClipboard();
             }

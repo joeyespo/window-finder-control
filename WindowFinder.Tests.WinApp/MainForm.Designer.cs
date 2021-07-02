@@ -92,7 +92,7 @@ namespace TestControl
             // 
             // windowFinder
             // 
-            this.windowFinder.isCaptureToClipboard = true;
+            this.windowFinder.isDoScreenshot = true;
             this.windowFinder.isFindOnlyTopLevel = false;
             this.windowFinder.Location = new System.Drawing.Point(100, 20);
             this.windowFinder.Name = "windowFinder";

@@ -149,7 +149,7 @@ namespace TestControl
 
                 ckbScreenshot.Enabled = true;
 
-                if (this.windowFinder.isCaptureToClipboard)
+                if (this.windowFinder.isDoScreenshot)
                     ckbScreenshot.CheckFromCode(true);
                 else
                     ckbScreenshot.CheckFromCode(false);
@@ -166,9 +166,9 @@ namespace TestControl
 
         private void ckbClipboard_CheckedChanged(object sender, EventArgs e)
         {
-            this.windowFinder.isCaptureToClipboard = !this.windowFinder.isCaptureToClipboard;
+            this.windowFinder.isDoScreenshot = !this.windowFinder.isDoScreenshot;
 
-            Debug.WriteLine($"isCaptureToClipboard={this.windowFinder.isCaptureToClipboard}");
+            Debug.WriteLine($"isDoScreenshot={this.windowFinder.isDoScreenshot}");
 
             RefreshUIByCfg();
         }
