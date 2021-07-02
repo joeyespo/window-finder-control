@@ -68,15 +68,16 @@ namespace TestControl
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         private void txtWindowHandle_TextChanged(object sender, System.EventArgs e)
         {
-            IntPtr handle;
-
+            IntPtr handle = IntPtr.Zero;
             try
             {
-                handle = (IntPtr)Convert.ToInt32(txtWindowHandle.Text, 16);
+                if (txtWindowHandle.Text != "")
+                {
+                    handle = (IntPtr)Convert.ToInt32(txtWindowHandle.Text, 16);
+                }
             }
             catch
             {
-                handle = IntPtr.Zero;
             }
 
             windowHandleChanging = true;
