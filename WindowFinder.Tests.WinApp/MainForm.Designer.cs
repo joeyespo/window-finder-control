@@ -46,7 +46,7 @@ namespace TestControl
             this.radiobtnInvertColor = new System.Windows.Forms.RadioButton();
             this.lblDpiAwareness = new System.Windows.Forms.Label();
             this.btnHelp = new System.Windows.Forms.Button();
-            this.ckbClipboard = new System.Windows.Forms.CheckBox();
+            this.ckbScreenshot = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.gpbTrayMe.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -237,25 +237,25 @@ namespace TestControl
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
             // 
-            // ckbClipboard
+            // ckbScreenshot
             // 
-            this.ckbClipboard.AutoSize = true;
-            this.ckbClipboard.Location = new System.Drawing.Point(285, 177);
-            this.ckbClipboard.Name = "ckbClipboard";
-            this.ckbClipboard.Size = new System.Drawing.Size(80, 17);
-            this.ckbClipboard.TabIndex = 4;
-            this.ckbClipboard.Text = "&Screenshot";
-            this.toolTip1.SetToolTip(this.ckbClipboard, "Send to clipboard the screenshot from target window location");
-            this.ckbClipboard.UseVisualStyleBackColor = true;
-            this.ckbClipboard.CheckedChanged += new System.EventHandler(this.ckbClipboard_CheckedChanged);
-            this.ckbClipboard.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ckbClipboard_MouseClick);
+            this.ckbScreenshot.AutoSize = true;
+            this.ckbScreenshot.Location = new System.Drawing.Point(285, 177);
+            this.ckbScreenshot.Name = "ckbScreenshot";
+            this.ckbScreenshot.Size = new System.Drawing.Size(80, 17);
+            this.ckbScreenshot.TabIndex = 4;
+            this.ckbScreenshot.Text = "&Screenshot";
+            this.toolTip1.SetToolTip(this.ckbScreenshot, "Send to clipboard the screenshot from target window location");
+            this.ckbScreenshot.UseVisualStyleBackColor = true;
+            this.ckbScreenshot.CheckedChanged += new System.EventHandler(this.ckbClipboard_CheckedChanged);
+            this.ckbScreenshot.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ckbClipboard_MouseClick);
             // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.btnClose;
             this.ClientSize = new System.Drawing.Size(380, 207);
-            this.Controls.Add(this.ckbClipboard);
+            this.Controls.Add(this.ckbScreenshot);
             this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.lblDpiAwareness);
             this.Controls.Add(this.groupBox1);
@@ -294,7 +294,7 @@ namespace TestControl
         private System.Windows.Forms.TextBox txtWindowRect;
         private System.Windows.Forms.Label lblWinRect;
         private System.Windows.Forms.Button btnHelp;
-        private System.Windows.Forms.CheckBox ckbClipboard;
+        private System.Windows.Forms.CheckBox ckbScreenshot;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.ComponentModel.IContainer components;
     }
