@@ -56,6 +56,14 @@ namespace WindowFinder
                 right = Convert.ToInt32(right * scale_factor);
                 bottom = Convert.ToInt32(bottom * scale_factor);
             }
+
+            public bool ContainsPoint(int x, int y)
+            {
+                if (x >= left && x < right && y >= top && y < bottom)
+                    return true;
+                else
+                    return false;
+            }
         }
 
         /// <summary>

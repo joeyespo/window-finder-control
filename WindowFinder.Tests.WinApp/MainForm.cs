@@ -22,6 +22,7 @@ namespace TestControl
             InitializeComponent();
 
             this.radiobtnAimingFrame.Checked = true;
+            lblScreenMousePos.Text = "";
 
             ckbMyThread.CheckFromCode(true);
             ckbMyProcess.CheckFromCode(true);
@@ -58,6 +59,20 @@ namespace TestControl
                 txtWindowRect.Text = "";
             else
                 txtWindowRect.Text = $"[{rt.Width} x {rt.Height}] LT({rt.Left}, {rt.Top}) RB({rt.Right}, {rt.Bottom})";
+        }
+
+        private void windowFinder_MouseDraggingChanged(object sender, MouseDraggingEventArgs e)
+        {
+            if (e.isStop)
+            {
+                lblFinderTool.Text = "Finder Tool:";
+                lblScreenMousePos.Text = "";
+            }
+            else
+            {
+                lblFinderTool.Text = "Mouse at screen:";
+                lblScreenMousePos.Text = $"X:{e.X} , Y:{e.Y}";
+            }
         }
 
         /// <summary>

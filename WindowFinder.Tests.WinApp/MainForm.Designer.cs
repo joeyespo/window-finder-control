@@ -28,6 +28,7 @@ namespace TestControl
         {
             this.components = new System.ComponentModel.Container();
             this.gpbTrayMe = new System.Windows.Forms.GroupBox();
+            this.lblScreenMousePos = new System.Windows.Forms.Label();
             this.txtWindowRect = new System.Windows.Forms.TextBox();
             this.lblWinRect = new System.Windows.Forms.Label();
             this.windowFinder = new WindowFinder.WindowFinder();
@@ -47,10 +48,10 @@ namespace TestControl
             this.lblDpiAwareness = new System.Windows.Forms.Label();
             this.btnHelp = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ckbMyProcess = new TestControl.MyCheckBox();
             this.ckbMyThread = new TestControl.MyCheckBox();
             this.ckbScreenshot = new TestControl.MyCheckBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.gpbTrayMe.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -58,6 +59,7 @@ namespace TestControl
             // 
             // gpbTrayMe
             // 
+            this.gpbTrayMe.Controls.Add(this.lblScreenMousePos);
             this.gpbTrayMe.Controls.Add(this.txtWindowRect);
             this.gpbTrayMe.Controls.Add(this.lblWinRect);
             this.gpbTrayMe.Controls.Add(this.windowFinder);
@@ -76,6 +78,15 @@ namespace TestControl
             this.gpbTrayMe.Size = new System.Drawing.Size(260, 167);
             this.gpbTrayMe.TabIndex = 0;
             this.gpbTrayMe.TabStop = false;
+            // 
+            // lblScreenMousePos
+            // 
+            this.lblScreenMousePos.AutoSize = true;
+            this.lblScreenMousePos.Location = new System.Drawing.Point(8, 33);
+            this.lblScreenMousePos.Name = "lblScreenMousePos";
+            this.lblScreenMousePos.Size = new System.Drawing.Size(63, 13);
+            this.lblScreenMousePos.TabIndex = 22;
+            this.lblScreenMousePos.Text = "?MousePos";
             // 
             // txtWindowRect
             // 
@@ -100,12 +111,13 @@ namespace TestControl
             this.windowFinder.isFindOnlyTopLevel = false;
             this.windowFinder.isIncludeMyProcess = true;
             this.windowFinder.isIncludeMyThread = true;
-            this.windowFinder.Location = new System.Drawing.Point(100, 15);
+            this.windowFinder.Location = new System.Drawing.Point(105, 15);
             this.windowFinder.Name = "windowFinder";
             this.windowFinder.Size = new System.Drawing.Size(31, 28);
             this.windowFinder.TabIndex = 1;
             this.windowFinder.tgwHighlightMethod = WindowFinder.WindowFinder.HighlightMethod.AimingFrame;
             this.windowFinder.WindowHandleChanged += new System.EventHandler(this.windowFinder_WindowHandleChanged);
+            this.windowFinder.MouseDraggingChanged += new System.EventHandler<WindowFinder.MouseDraggingEventArgs>(this.windowFinder_MouseDraggingChanged);
             // 
             // lblWindowHandle
             // 
@@ -120,7 +132,7 @@ namespace TestControl
             this.txtWindowHandle.Location = new System.Drawing.Point(60, 51);
             this.txtWindowHandle.MaxLength = 8;
             this.txtWindowHandle.Name = "txtWindowHandle";
-            this.txtWindowHandle.Size = new System.Drawing.Size(72, 20);
+            this.txtWindowHandle.Size = new System.Drawing.Size(76, 20);
             this.txtWindowHandle.TabIndex = 13;
             this.txtWindowHandle.TextChanged += new System.EventHandler(this.txtWindowHandle_TextChanged);
             // 
@@ -158,9 +170,10 @@ namespace TestControl
             // 
             // lblFinderTool
             // 
-            this.lblFinderTool.Location = new System.Drawing.Point(8, 19);
+            this.lblFinderTool.AutoSize = true;
+            this.lblFinderTool.Location = new System.Drawing.Point(8, 14);
             this.lblFinderTool.Name = "lblFinderTool";
-            this.lblFinderTool.Size = new System.Drawing.Size(84, 16);
+            this.lblFinderTool.Size = new System.Drawing.Size(63, 13);
             this.lblFinderTool.TabIndex = 0;
             this.lblFinderTool.Text = "Finder Tool:";
             // 
@@ -247,6 +260,17 @@ namespace TestControl
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.ckbMyProcess);
+            this.groupBox2.Controls.Add(this.ckbMyThread);
+            this.groupBox2.Location = new System.Drawing.Point(280, 55);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(92, 54);
+            this.groupBox2.TabIndex = 10;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Include";
+            // 
             // ckbMyProcess
             // 
             this.ckbMyProcess.AutoSize = true;
@@ -282,17 +306,6 @@ namespace TestControl
             this.toolTip1.SetToolTip(this.ckbScreenshot, "Send to clipboard the screenshot from target window location");
             this.ckbScreenshot.UseVisualStyleBackColor = true;
             this.ckbScreenshot.CheckedChanged_ByHuman += new System.EventHandler(this.ckbScreenshot_CheckedChanged_ByHuman);
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.ckbMyProcess);
-            this.groupBox2.Controls.Add(this.ckbMyThread);
-            this.groupBox2.Location = new System.Drawing.Point(280, 55);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(92, 54);
-            this.groupBox2.TabIndex = 10;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Include";
             // 
             // MainForm
             // 
@@ -346,5 +359,6 @@ namespace TestControl
         private System.Windows.Forms.GroupBox groupBox2;
         private MyCheckBox ckbMyProcess;
         private MyCheckBox ckbMyThread;
+        private System.Windows.Forms.Label lblScreenMousePos;
     }
 }

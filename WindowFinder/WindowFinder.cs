@@ -58,6 +58,18 @@ namespace WindowFinder
         public event EventHandler WindowHandleChanged;
 
         /// <summary>
+        /// When user is dragging the finder, this event fires.
+        /// When user stops dragging the finder, this event fires with isStop=true.
+        /// </summary>
+        public event EventHandler<MouseDraggingEventArgs> MouseDraggingChanged;
+
+        void OnMouseDraggingChanged(MouseDraggingEventArgs e)
+        {
+            if (MouseDraggingChanged != null)
+                MouseDraggingChanged(this, e);
+        }
+
+        /// <summary>
         /// Handle of the window found.
         /// </summary>
         [Browsable(false)]
@@ -133,6 +145,9 @@ namespace WindowFinder
         {
             get { return _tgWinRect;  }
         }
+
+        public Point ScreenMousePos { get; private set; }
+
 
         /// <summary>
         /// If true, only top-level window can be highlighted.
@@ -214,6 +229,8 @@ namespace WindowFinder
             picTarget.Image = bitmapFind;
         }
 
+        private Point _RelaMousePos;
+
         /// <summary>
         /// Handles the MouseDown event of the picTarget control.
         /// </summary>
@@ -232,6 +249,8 @@ namespace WindowFinder
             isTargeting = true;
             targetWindow = IntPtr.Zero;
 
+            _RelaMousePos = new Point(e.X, e.Y);
+
             // Show info
             SetWindowHandle(picTarget.Handle);
 
@@ -241,8 +260,7 @@ namespace WindowFinder
 
         private Timer _timerCheckKey = null;
         private bool _wasCtrlKeyDown = false;
-        private int _mousex = -1;
-        private int _mousey = -1;
+
 
         private Win32.RECT _target_hwnd_screen_rect; // in physical(pixel) coordinates
         private bool _is_target_rect_accurate;
@@ -258,8 +276,7 @@ namespace WindowFinder
             if(!isTargeting)
                 return;
 
-            _mousex = e.X;
-            _mousey = e.Y;
+            _RelaMousePos = new Point(e.X, e.Y);
 
             RetargetMyHwnd();
         }
@@ -289,6 +306,8 @@ namespace WindowFinder
 
             _timerCheckKey.Stop();
 
+            OnMouseDraggingChanged(new MouseDraggingEventArgs(ScreenMousePos.X, ScreenMousePos.Y, true));
+
             if (isDoScreenshot && tgwHighlightMethod==HighlightMethod.AimingFrame)
             {
                 MyCaptureToClipboard();
@@ -306,9 +325,12 @@ namespace WindowFinder
 
         private void RetargetMyHwnd()
         {
-            Point pt = new Point(_mousex, _mousey);
-
+            Point pt = _RelaMousePos;
             Win32.ClientToScreen(picTarget.Handle, ref pt);
+
+            ScreenMousePos = pt;
+            OnMouseDraggingChanged(new MouseDraggingEventArgs(ScreenMousePos.X, ScreenMousePos.Y, false));
+
 
             // Get screen coords from client coords and window handle
             IntPtr hChild1 = Win32.WindowFromPoint(IntPtr.Zero, pt.X, pt.Y);
@@ -473,8 +495,8 @@ namespace WindowFinder
         }
 
         /// <summary>
-        /// Highlights the target window, and the API user can control whether
-        /// a window/control from the calling thread/process is consider a valid target.
+        /// Highlights the target window, and the API user can decide whether
+        /// [a window/control from the calling thread/process] is considered a valid target.
         /// Previous highlight(of an old window) is turned off at the same time.
         /// </summary>
         private void HighlightValidWindow(IntPtr hWnd, IntPtr hOwner)
@@ -593,5 +615,20 @@ namespace WindowFinder
         private bool isWindowUnicode = false;
         private string windowCharset = string.Empty;
         private Rectangle _tgWinRect = Rectangle.Empty;
+    }
+
+
+    public class MouseDraggingEventArgs : System.EventArgs
+    {
+        public readonly int X;
+        public readonly int Y;
+        public readonly bool isStop;
+
+        public MouseDraggingEventArgs(int X, int Y, bool isStop=false)
+        {
+            this.X = X;
+            this.Y = Y;
+            this.isStop = isStop;
+        }
     }
 }
