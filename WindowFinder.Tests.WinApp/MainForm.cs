@@ -48,8 +48,7 @@ namespace TestControl
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         private void windowFinder_WindowHandleChanged(object sender, System.EventArgs e)
         {
-            if(!windowHandleChanging)
-                txtWindowHandle.Text = windowFinder.WindowHandleText;
+            txtWindowHandle.Text = windowFinder.WindowHandleText;
             txtWindowClass.Text = windowFinder.WindowClass;
             txtWindowText.Text = windowFinder.WindowText;
             txtWindowCharset.Text = windowFinder.WindowCharset;
@@ -80,20 +79,16 @@ namespace TestControl
             {
             }
 
-            windowHandleChanging = true;
             try
             {
                 windowFinder.SetWindowHandle(handle);
             }
             finally
             {
-                windowHandleChanging = false;
             }
         }
         
         #endregion
-
-        private bool windowHandleChanging = false;
 
         private void radiobtnInvertColor_CheckedChanged(object sender, EventArgs e)
         {
