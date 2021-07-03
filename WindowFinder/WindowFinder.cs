@@ -57,6 +57,12 @@ namespace WindowFinder
         /// </summary>
         public event EventHandler WindowHandleChanged;
 
+        void OnWindowHandleChanged()
+        {
+            if (WindowHandleChanged != null)
+                WindowHandleChanged(this, EventArgs.Empty);
+        }
+
         /// <summary>
         /// When user is dragging the finder, this event fires.
         /// When user stops dragging the finder, this event fires with isStop=true.
@@ -422,6 +428,8 @@ namespace WindowFinder
         /// <param name="handle">The handle to set to.</param>
         public void SetWindowHandle(IntPtr handle)
         {
+            IntPtr oldhwnd = windowHandle;
+
             if((Win32.IsWindow(handle) == 0) || !IsIncludeWindow(handle, this.Handle))
             {
                 // Clear window information
@@ -448,8 +456,8 @@ namespace WindowFinder
                 _tgWinRect = new Rectangle(rt.left, rt.top, rt.right-rt.left, rt.bottom-rt.top);
             }
 
-            if(WindowHandleChanged != null)
-                WindowHandleChanged(this, EventArgs.Empty);
+            if(oldhwnd != windowHandle)
+                OnWindowHandleChanged();
         }
 
         #endregion
