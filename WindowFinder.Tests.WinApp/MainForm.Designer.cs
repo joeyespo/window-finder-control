@@ -47,10 +47,10 @@ namespace TestControl
             this.lblDpiAwareness = new System.Windows.Forms.Label();
             this.btnHelp = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ckbMyProcess = new TestControl.MyCheckBox();
             this.ckbMyThread = new TestControl.MyCheckBox();
             this.ckbScreenshot = new TestControl.MyCheckBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.gpbTrayMe.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -247,17 +247,6 @@ namespace TestControl
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
             // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.ckbMyProcess);
-            this.groupBox2.Controls.Add(this.ckbMyThread);
-            this.groupBox2.Location = new System.Drawing.Point(280, 60);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(92, 54);
-            this.groupBox2.TabIndex = 10;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Include";
-            // 
             // ckbMyProcess
             // 
             this.ckbMyProcess.AutoSize = true;
@@ -294,10 +283,20 @@ namespace TestControl
             this.ckbScreenshot.UseVisualStyleBackColor = true;
             this.ckbScreenshot.CheckedChanged_ByHuman += new System.EventHandler(this.ckbScreenshot_CheckedChanged_ByHuman);
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.ckbMyProcess);
+            this.groupBox2.Controls.Add(this.ckbMyThread);
+            this.groupBox2.Location = new System.Drawing.Point(280, 60);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(92, 54);
+            this.groupBox2.TabIndex = 10;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Include";
+            // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.CancelButton = this.btnClose;
             this.ClientSize = new System.Drawing.Size(380, 207);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.ckbScreenshot);
