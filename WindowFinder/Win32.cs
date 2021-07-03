@@ -294,7 +294,7 @@ namespace WindowFinder
 
             rtp = rtv; // assume equal, adjust soon
 
-            IntPtr hwndToplevel = Win32.GetAncestor(hWnd, Win32.GetAncestorFlags.GetRoot);
+            IntPtr hwndToplevel = GetMyToplevelWnd(hWnd);
 
             if (DpiUtilities.IsWin7() && (DpiUtilities.Win7_SystemDpi() > 96))
             {
@@ -404,7 +404,8 @@ namespace WindowFinder
 
             // Note: Only top-level window can be queried for DWM window rect.
 
-            IntPtr hwndtop = Win32.GetAncestor(hwnd0, Win32.GetAncestorFlags.GetRoot);
+            IntPtr hwndtop = GetMyToplevelWnd(hwnd0);
+
             RECT recttop;
             GetWindowRect(hwndtop, out recttop);
 
@@ -594,7 +595,7 @@ namespace WindowFinder
             if (IsWindow(hWnd) == 0)
                 return false;
 
-            IntPtr hwndRoot = Win32.GetAncestor(hWnd, Win32.GetAncestorFlags.GetRoot);
+            IntPtr hwndRoot = GetMyToplevelWnd(hWnd);
             if (hwndRoot == hWnd)
                 return true;
             else
@@ -749,6 +750,12 @@ namespace WindowFinder
             GW_CHILD = 5,
             GW_ENABLEDPOPUP = 6
         }
+
+        public static IntPtr GetMyToplevelWnd(IntPtr hwnd)
+        {
+            return Win32.GetAncestor(hwnd, Win32.GetAncestorFlags.GetRoot);
+        }
+
 
         /// <summary>
         /// Since Win2000.

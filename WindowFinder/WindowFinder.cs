@@ -297,7 +297,7 @@ namespace WindowFinder
 
         private bool IsFromAimingFrame(IntPtr hwnd)
         {
-            IntPtr hwndToplevel = Win32.GetAncestor(hwnd, Win32.GetAncestorFlags.GetRoot);
+            IntPtr hwndToplevel = Win32.GetMyToplevelWnd(hwnd);
             if (hwndToplevel == _aimframe.Handle)
                 return true;
             else
@@ -348,7 +348,7 @@ namespace WindowFinder
 
             if (isFindOnlyTopLevel || _wasCtrlKeyDown)
             {
-                hChild1 = Win32.GetAncestor(hChild1, Win32.GetAncestorFlags.GetRoot);
+                hChild1 = Win32.GetMyToplevelWnd(hChild1);
             }
 
             // Show info
