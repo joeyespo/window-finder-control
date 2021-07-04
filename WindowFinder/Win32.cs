@@ -964,6 +964,18 @@ namespace WindowFinder
         [DllImport("user32.dll")]
         public static extern bool IsProcessDPIAware();
 
+        public static bool IsSelfProcessDPIAware()
+        {
+            try
+            {
+                return IsProcessDPIAware(); // ok on Win7
+            }
+            catch (Exception)
+            {
+                return false; // WinXP
+            }
+        }
+
         /// <summary>
         /// Win7 SetProcessDPIAware.
         /// </summary>

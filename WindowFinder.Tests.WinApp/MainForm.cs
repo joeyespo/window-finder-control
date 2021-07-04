@@ -131,8 +131,8 @@ namespace TestControl
 
             if(procdaw == DpiUtilities.PROCESS_DPI_AWARENESS.PROCESS_DPI_Unset)
             {
-                // For Win7
-                bool win7daw = WindowFinder.DpiUtilities.IsProcessDPIAware();
+                // For Win7/XP
+                bool win7daw = WindowFinder.DpiUtilities.IsSelfProcessDPIAware();
                 if (win7daw)
                     procdaw = DpiUtilities.PROCESS_DPI_AWARENESS.PROCESS_SYSTEM_DPI_AWARE;
                 else

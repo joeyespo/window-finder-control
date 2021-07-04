@@ -198,8 +198,7 @@ namespace TestControl
 
         public static void ShowParameterHelp()
         {
-            string info = @"
-Pass a parameter to set DPI awareness for this process.
+            string info = @"Pass a parameter to set DPI awareness for this process.
 
 0 : DPI unware (this action is redundant)
 1 : System-DPI aware

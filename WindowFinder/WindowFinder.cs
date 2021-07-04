@@ -337,6 +337,7 @@ namespace WindowFinder
             ScreenMousePos = pt;
             OnMouseDraggingChanged(new MouseDraggingEventArgs(ScreenMousePos.X, ScreenMousePos.Y, false));
 
+			//Debug.WriteLine($"### RetargetMyHwnd(): {_RelaMousePos.X},{_RelaMousePos.Y} -> {pt.X},{pt.Y}");
 
             // Get screen coords from client coords and window handle
             IntPtr hChild1 = Win32.WindowFromPoint(IntPtr.Zero, pt.X, pt.Y);
