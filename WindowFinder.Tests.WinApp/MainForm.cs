@@ -107,6 +107,8 @@ namespace TestControl
 
         private void radiobtnInvertColor_CheckedChanged(object sender, EventArgs e)
         {
+            // memo: this will be triggered when either of the radio button is clicked.
+
             this.windowFinder.tgwHighlightMethod = radiobtnInvertColor.Checked
                 ? WindowFinder.WindowFinder.HighlightMethod.InvertColor
                 : WindowFinder.WindowFinder.HighlightMethod.AimingFrame;
@@ -148,6 +150,26 @@ namespace TestControl
                 hint += "Per-monitor-DPI aware";
 
             lblDpiAwareness.Text = hint;
+
+            if (DpiUtilities.IsWin81())
+            {
+                // Warn program limitation on Win81 and Win10.1607- . (not for Win7 & Win10.1607+)
+
+                if (procdaw != DpiUtilities.PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE)
+                {
+                    string info = @"Since you are running this program on Win81 or pre-Win10.1607, and this program is NOT run with Per-monitor aware mode, this results in two issues: 
+
+First. The ""traditional"" Invert-color highlighting method does not work correctly if the target window is on a non-100% DPI-scaling monitor.
+
+Second. The Aiming-frame method has similar issues on non-100% DPI-scaling monitor but with different symptom: Although it visually frames the target window correctly, it does NOT screenshot the window correctly, due to unreliable physical window width detection. 
+
+So, on Win81 and pre-Win10.1607, to make this program run correctly, you must pass parameter ""2"" to it, to make it run in Per-monitor-aware mode.
+";
+                    MessageBox.Show(info, "Alert",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+
         }
 
         private void btnHelp_Click(object sender, EventArgs e)
