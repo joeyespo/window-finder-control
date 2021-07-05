@@ -306,7 +306,7 @@ namespace WindowFinder
 
             if (DpiUtilities.IsWin7() && (DpiUtilities.Win7_SystemDpi() > 96))
             {
-                rtp = Win7_SpecialAdjust(hWnd, ref rtv);
+                rtp = Win7_HighDpiAdjustRect(hWnd, ref rtv);
             }
 
             Win32.SetWindowPos(hwndOverlay, Win32.HWND_TOP,
@@ -403,7 +403,7 @@ namespace WindowFinder
         ///    will place hwnd1 at exactly the same location as hwnd0.
         /// </param>
         /// <returns>Physical coornidates of hwnd0's Rect.</returns>
-        private static RECT Win7_SpecialAdjust(IntPtr hwnd0, ref RECT rect0)
+        private static RECT Win7_HighDpiAdjustRect(IntPtr hwnd0, ref RECT rect0)
         {
             Debug.Assert(DpiUtilities.IsWin7());
             Debug.Assert(DpiUtilities.Win7_SystemDpi() > 96);
