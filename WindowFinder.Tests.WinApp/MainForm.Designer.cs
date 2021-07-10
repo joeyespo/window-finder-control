@@ -48,10 +48,10 @@ namespace TestControl
             this.lblDpiAwareness = new System.Windows.Forms.Label();
             this.btnHelp = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ckbMyProcess = new TestControl.MyCheckBox();
             this.ckbMyThread = new TestControl.MyCheckBox();
             this.ckbScreenshot = new TestControl.MyCheckBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.gpbTrayMe.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -219,7 +219,7 @@ namespace TestControl
             this.radiobtnSnapFrame.AutoSize = true;
             this.radiobtnSnapFrame.Location = new System.Drawing.Point(5, 34);
             this.radiobtnSnapFrame.Name = "radiobtnSnapFrame";
-            this.radiobtnSnapFrame.Size = new System.Drawing.Size(85, 17);
+            this.radiobtnSnapFrame.Size = new System.Drawing.Size(79, 17);
             this.radiobtnSnapFrame.TabIndex = 9;
             this.radiobtnSnapFrame.Text = "Snap-frame";
             this.toolTip1.SetToolTip(this.radiobtnSnapFrame, "Overlay a (red) aiming-frame window on the target window, and keep the former sam" +
@@ -260,17 +260,6 @@ namespace TestControl
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
             // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.ckbMyProcess);
-            this.groupBox2.Controls.Add(this.ckbMyThread);
-            this.groupBox2.Location = new System.Drawing.Point(280, 55);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(92, 54);
-            this.groupBox2.TabIndex = 10;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Include";
-            // 
             // ckbMyProcess
             // 
             this.ckbMyProcess.AutoSize = true;
@@ -307,6 +296,17 @@ namespace TestControl
             this.ckbScreenshot.UseVisualStyleBackColor = true;
             this.ckbScreenshot.CheckedChanged_ByHuman += new System.EventHandler(this.ckbScreenshot_CheckedChanged_ByHuman);
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.ckbMyProcess);
+            this.groupBox2.Controls.Add(this.ckbMyThread);
+            this.groupBox2.Location = new System.Drawing.Point(280, 55);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(92, 54);
+            this.groupBox2.TabIndex = 10;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Include";
+            // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -320,7 +320,7 @@ namespace TestControl
             this.Controls.Add(this.gpbTrayMe);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Test WindowFinder Control";
+            this.Text = "wcFinder TestApp";
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.gpbTrayMe.ResumeLayout(false);
             this.gpbTrayMe.PerformLayout();
