@@ -234,7 +234,7 @@ namespace TestControl
             this.radiobtnInvertColor.Size = new System.Drawing.Size(78, 17);
             this.radiobtnInvertColor.TabIndex = 8;
             this.radiobtnInvertColor.TabStop = true;
-            this.radiobtnInvertColor.Text = "&Invert color";
+            this.radiobtnInvertColor.Text = "&Invert-color";
             this.toolTip1.SetToolTip(this.radiobtnInvertColor, "WinXP era highlight method, drawing an invert-colored frame around target window." +
         " \r\nIt loses visual effect with DWM-rendered top-level window since Vista.");
             this.radiobtnInvertColor.UseVisualStyleBackColor = true;

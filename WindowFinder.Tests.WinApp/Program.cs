@@ -200,7 +200,7 @@ namespace TestControl
         {
             string info = @"Pass a parameter to set DPI awareness for this process.
 
-0 : DPI unware (this action is redundant)
+0 : DPI unaware (default)
 1 : System-DPI aware
 2 : Per-monitor-DPI aware
 
