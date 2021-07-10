@@ -32,7 +32,7 @@ namespace WindowFinder
             picTarget.Size = new Size(31, 28);
             Size = picTarget.Size;
 
-            _aimframe = new AimingFrame();
+            _snapframe = new SnapFrame();
 
             _timerCheckKey = new Timer();
             _timerCheckKey.Interval = 100;
@@ -164,27 +164,27 @@ namespace WindowFinder
         public enum HighlightMethod
         {
             InvertColor = 0,
-            AimingFrame = 1,
+            SnapFrame = 1,
         }
 
         /// <summary>
         /// Select from one of two window-highlighting method.
         /// InvertColor is the traditional one, which loses visual effect on Win7+ DWM top-level window.
-        /// AimingFrame uses a layered window(since Win2000) to demarcate a window's border, always works.
+        /// SnapFrame uses a layered window(since Win2000) to demarcate a window's border, always works.
         /// </summary>
         [Browsable(true)]
-        public HighlightMethod tgwHighlightMethod { get; set; } = HighlightMethod.AimingFrame;
+        public HighlightMethod tgwHighlightMethod { get; set; } = HighlightMethod.SnapFrame;
 
         /// <summary>
         /// This refers to a special layered-window that is visually a red frame.
         /// This red frame will tell human user which window he is currently aiming.
         /// </summary>
-        private AimingFrame _aimframe;
+        private SnapFrame _snapframe;
 
         /// <summary>
         /// If true, when user release the mouse button, the screen image on target window location is
         /// copied to clipboard.
-        /// Note: This feature work only in AimingFrame method.
+        /// Note: This feature work only in SnapFrame method.
         /// For InvertColor method, it is much harder or impractical to know target window location
         /// in various situations.
         /// </summary>
@@ -314,16 +314,16 @@ namespace WindowFinder
 
             OnMouseDraggingChanged(new MouseDraggingEventArgs(ScreenMousePos.X, ScreenMousePos.Y, true));
 
-            if (isDoScreenshot && tgwHighlightMethod==HighlightMethod.AimingFrame)
+            if (isDoScreenshot && tgwHighlightMethod==HighlightMethod.SnapFrame)
             {
                 MyCaptureToClipboard();
             }
         }
 
-        private bool IsFromAimingFrame(IntPtr hwnd)
+        private bool IsFromSnapFrame(IntPtr hwnd)
         {
             IntPtr hwndToplevel = Win32.GetMyToplevelWnd(hwnd);
-            if (hwndToplevel == _aimframe.Handle)
+            if (hwndToplevel == _snapframe.Handle)
                 return true;
             else
                 return false;
@@ -343,7 +343,7 @@ namespace WindowFinder
             IntPtr hChild1 = Win32.WindowFromPoint(IntPtr.Zero, pt.X, pt.Y);
             // -- We name it "child" bcz it must be a child-or-grand-child of the Desktop window.
 
-            if (IsFromAimingFrame(hChild1))
+            if (IsFromSnapFrame(hChild1))
                 return;
 
             // Get real window
@@ -582,23 +582,23 @@ namespace WindowFinder
                 if (targetWindow == IntPtr.Zero)
                 {
                     // highlight on for new window
-                    // Note: If I place this _aimframe.Show() after HighlightWindow_Overlaying(),
-                    // the aiming-frame will be brought to front, which is not desired.
-                    _aimframe.Show(); 
+                    // Note: If I place this _snapframe.Show() after HighlightWindow_Overlaying(),
+                    // the Snap-frame will be brought to front, which is not desired.
+                    _snapframe.Show(); 
 
                     Win32.RECT rtp;
-                    bool accurate = Win32.HighlightWindow_Overlaying(hWnd, _aimframe.Handle, out rtp);
+                    bool accurate = Win32.HighlightWindow_Overlaying(hWnd, _snapframe.Handle, out rtp);
 
                     string qm = accurate ? "" : "(?) ";
 
-                    _aimframe.SetHint($"{qm}{rtp.Width} x {rtp.Height}");
+                    _snapframe.SetHint($"{qm}{rtp.Width} x {rtp.Height}");
 
                     _target_hwnd_screen_rect = rtp;
                     _is_target_rect_accurate = accurate;
                 }
                 else
                 {
-                    _aimframe.Hide(); // highlight off for old window
+                    _snapframe.Hide(); // highlight off for old window
                 }
             }
 

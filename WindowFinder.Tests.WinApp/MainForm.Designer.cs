@@ -43,7 +43,7 @@ namespace TestControl
             this.lblWindowClass = new System.Windows.Forms.Label();
             this.btnClose = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.radiobtnAimingFrame = new System.Windows.Forms.RadioButton();
+            this.radiobtnSnapFrame = new System.Windows.Forms.RadioButton();
             this.radiobtnInvertColor = new System.Windows.Forms.RadioButton();
             this.lblDpiAwareness = new System.Windows.Forms.Label();
             this.btnHelp = new System.Windows.Forms.Button();
@@ -115,7 +115,7 @@ namespace TestControl
             this.windowFinder.Name = "windowFinder";
             this.windowFinder.Size = new System.Drawing.Size(31, 28);
             this.windowFinder.TabIndex = 1;
-            this.windowFinder.tgwHighlightMethod = WindowFinder.WindowFinder.HighlightMethod.AimingFrame;
+            this.windowFinder.tgwHighlightMethod = WindowFinder.WindowFinder.HighlightMethod.SnapFrame;
             this.windowFinder.WindowHandleChanged += new System.EventHandler(this.windowFinder_WindowHandleChanged);
             this.windowFinder.MouseDraggingChanged += new System.EventHandler<WindowFinder.MouseDraggingEventArgs>(this.windowFinder_MouseDraggingChanged);
             // 
@@ -205,7 +205,7 @@ namespace TestControl
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.radiobtnAimingFrame);
+            this.groupBox1.Controls.Add(this.radiobtnSnapFrame);
             this.groupBox1.Controls.Add(this.radiobtnInvertColor);
             this.groupBox1.Location = new System.Drawing.Point(280, 115);
             this.groupBox1.Name = "groupBox1";
@@ -214,17 +214,17 @@ namespace TestControl
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Highlight by";
             // 
-            // radiobtnAimingFrame
+            // radiobtnSnapFrame
             // 
-            this.radiobtnAimingFrame.AutoSize = true;
-            this.radiobtnAimingFrame.Location = new System.Drawing.Point(5, 34);
-            this.radiobtnAimingFrame.Name = "radiobtnAimingFrame";
-            this.radiobtnAimingFrame.Size = new System.Drawing.Size(85, 17);
-            this.radiobtnAimingFrame.TabIndex = 9;
-            this.radiobtnAimingFrame.Text = "&Aiming frame";
-            this.toolTip1.SetToolTip(this.radiobtnAimingFrame, "Overlay a (red) aiming-frame window on the target window, and keep the former sam" +
+            this.radiobtnSnapFrame.AutoSize = true;
+            this.radiobtnSnapFrame.Location = new System.Drawing.Point(5, 34);
+            this.radiobtnSnapFrame.Name = "radiobtnSnapFrame";
+            this.radiobtnSnapFrame.Size = new System.Drawing.Size(85, 17);
+            this.radiobtnSnapFrame.TabIndex = 9;
+            this.radiobtnSnapFrame.Text = "Snap-frame";
+            this.toolTip1.SetToolTip(this.radiobtnSnapFrame, "Overlay a (red) aiming-frame window on the target window, and keep the former sam" +
         "e-size as latter.\r\nThis works well regardless of DWM-rendering.");
-            this.radiobtnAimingFrame.UseVisualStyleBackColor = true;
+            this.radiobtnSnapFrame.UseVisualStyleBackColor = true;
             // 
             // radiobtnInvertColor
             // 
@@ -347,7 +347,7 @@ namespace TestControl
         private System.Windows.Forms.Label lblWindowClass;
         private WindowFinder.WindowFinder windowFinder;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.RadioButton radiobtnAimingFrame;
+        private System.Windows.Forms.RadioButton radiobtnSnapFrame;
         private System.Windows.Forms.RadioButton radiobtnInvertColor;
         private System.Windows.Forms.Label lblDpiAwareness;
         private System.Windows.Forms.TextBox txtWindowRect;

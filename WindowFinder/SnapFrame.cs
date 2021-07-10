@@ -7,16 +7,16 @@ using System.Windows.Forms;
 
 namespace WindowFinder
 {
-    class AimingFrame : Form
+    class SnapFrame : Form
     {
         private static Color MyTransparentColor = Color.Black;
         private static Color FrameColor = Color.Red;
         private static int FrameWidth = 3;
 
 
-        public AimingFrame()
+        public SnapFrame()
         {
-            this.Text = "Aiming Frame";
+            this.Text = "Snap-frame";
 
             this.FormBorderStyle = FormBorderStyle.None;
 

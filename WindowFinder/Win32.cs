@@ -352,7 +352,7 @@ namespace WindowFinder
             }
 
             //
-            // Now we also want to place the aiming-window JUST ABOVE the target hWnd (z-order),
+            // Now we also want to place the snapframe-window JUST ABOVE the target hWnd (z-order),
             // not blindly make it TOP at z-order.
             //
 

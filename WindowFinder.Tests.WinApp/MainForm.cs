@@ -21,7 +21,7 @@ namespace TestControl
         {
             InitializeComponent();
 
-            this.radiobtnAimingFrame.Checked = true;
+            this.radiobtnSnapFrame.Checked = true;
             lblScreenMousePos.Text = "";
 
             ckbMyThread.CheckFromCode(true);
@@ -111,7 +111,7 @@ namespace TestControl
 
             this.windowFinder.tgwHighlightMethod = radiobtnInvertColor.Checked
                 ? WindowFinder.WindowFinder.HighlightMethod.InvertColor
-                : WindowFinder.WindowFinder.HighlightMethod.AimingFrame;
+                : WindowFinder.WindowFinder.HighlightMethod.SnapFrame;
 
             RefreshUIByCfg();
         }
@@ -161,7 +161,7 @@ namespace TestControl
 
 First. The ""traditional"" Invert-color highlighting method does not work correctly if the target window is on a non-100% DPI-scaling monitor.
 
-Second. The Aiming-frame method has similar issues on non-100% DPI-scaling monitor but with different symptom: Although it visually frames the target window correctly, it does NOT screenshot the window correctly, due to unreliable physical window width detection. 
+Second. The Snap-frame method has similar issues on non-100% DPI-scaling monitor but with different symptom: Although it visually frames the target window correctly, it does NOT screenshot the window correctly, due to unreliable physical window width detection. 
 
 So, on Win81 and pre-Win10.1607, to make this program run correctly, you must pass parameter ""2"" to it, to make it run in Per-monitor-aware mode.
 ";
@@ -196,9 +196,9 @@ So, on Win81 and pre-Win10.1607, to make this program run correctly, you must pa
 
             //
 
-            if (this.windowFinder.tgwHighlightMethod == WindowFinder.WindowFinder.HighlightMethod.AimingFrame)
+            if (this.windowFinder.tgwHighlightMethod == WindowFinder.WindowFinder.HighlightMethod.SnapFrame)
             {
-                this.radiobtnAimingFrame.Checked = true;
+                this.radiobtnSnapFrame.Checked = true;
 
                 ckbScreenshot.Enabled = true;
 
