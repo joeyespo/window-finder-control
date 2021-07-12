@@ -116,8 +116,12 @@ namespace TestControl
             RefreshUIByCfg();
         }
 
+        private static int verTestApp = 10;
+
         private void MainForm_Shown(object sender, EventArgs e)
         {
+            this.Text += $" ver:{WindowFinder.WindowFinder.verMajor}.{WindowFinder.WindowFinder.verMinor}.{verTestApp}";
+
             DpiUtilities.PROCESS_DPI_AWARENESS procdaw = DpiUtilities.PROCESS_DPI_AWARENESS.PROCESS_DPI_Unset;
 
             try
@@ -155,13 +159,14 @@ namespace TestControl
             {
                 // Warn program limitation on Win81 and Win10.1607- . (not for Win7 & Win10.1607+)
 
-                if (procdaw != DpiUtilities.PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE)
+                if (procdaw != DpiUtilities.PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE
+                    && Screen.AllScreens.Length > 1)
                 {
-                    string info = @"Since you are running this program on Win81 or pre-Win10.1607, and this program is NOT run with Per-monitor aware mode, this results in two issues: 
+                    string info = @"Since you are running this program on Win81 or pre-Win10.1607 with more than one monitor, and this program is NOT run with Per-monitor aware mode, this results in two issues: 
 
-First. The ""traditional"" Invert-color highlighting method does not work correctly if the target window is on a non-100% DPI-scaling monitor.
+First. The ""traditional"" Invert-color highlighting method does not always work correctly in non-100% DPI-scaling environment.
 
-Second. The Snap-frame method has similar issues on non-100% DPI-scaling monitor but with different symptom: Although it visually frames the target window correctly, it does NOT screenshot the window correctly, due to unreliable physical window width detection. 
+Second. The Snap-frame method has issues in mixmode DPI-scaling environment: Although it visually frames the target window correctly, it does NOT screenshot the window correctly, due to unreliable physical window width detection. 
 
 So, on Win81 and pre-Win10.1607, to make this program run correctly, you must pass parameter ""2"" to it, to make it run in Per-monitor-aware mode.
 ";

@@ -8,6 +8,8 @@ using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
+// Version number in static member verMajor, verMinor .
+
 namespace WindowFinder
 {
     [DefaultEvent("WindowHandleChanged")]
@@ -38,6 +40,10 @@ namespace WindowFinder
             _timerCheckKey.Interval = 100;
             _timerCheckKey.Tick += new EventHandler(TimerCheckKey);
         }
+
+        public static int verMajor { get; private set; } = 2;
+        public static int verMinor { get; private set; } = 1;
+
 
         void TimerCheckKey(object obj, EventArgs ea)
         {
