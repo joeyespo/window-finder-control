@@ -238,12 +238,13 @@ namespace WindowFinder
             {
                 // This section is only suitable to Win81
 
-                int selfdpi = DpiUtilities.Win81_GetWindowDpi(IntPtr.Zero);
-                int targetdpi = DpiUtilities.Win81_GetWindowDpi(hWnd);
+                int selfdpi = DpiUtilities.Win81_GetWindowDpi_tricky(IntPtr.Zero);
+                int targetdpi = DpiUtilities.Win81_GetWindowDpi_tricky(hWnd);
 
                 scale_factor = (float)targetdpi / selfdpi; // may =1 or <1
 
-                // [2021-06-26] Messy on Win81: Still buggy when caller is Per-mon-aware.
+                // [2021-06-26] Messy on Win81: 
+				// The resulting scale_factor is still buggy when caller is *Per-mon*-aware.
             }
 
             // Get the screen coordinates of the rectangle of the window.
@@ -279,9 +280,9 @@ namespace WindowFinder
         /// <summary>
         /// Highlight target window(hWnd) by overlaying it with an same-size window(hwndOverlay).
         /// </summary>
-        /// <param name="hWnd"></param>
-        /// <param name="hwndOverlay"></param>
-        /// <param name="rtp">Report physical(pixel) coordiante of the target hWnd.</param>
+        /// <param name="hWnd">the target window.</param>
+        /// <param name="hwndOverlay">the Snap-frame window.</param>
+        /// <param name="rtp">Report physical(pixel) coordinate of the target hWnd.</param>
         /// <returns>Whether the returned rtp is accurate.</returns>
         internal static bool HighlightWindow_Overlaying(IntPtr hWnd, IntPtr hwndOverlay, out RECT rtp)
         {
@@ -949,6 +950,17 @@ namespace WindowFinder
         public static extern int SetProcessDpiAwareness(PROCESS_DPI_AWARENESS value);
 
         /// <summary>
+        /// Win81 GetScaleFactorForMonitor().
+		/// [2021-07-12] But I find this WinAPI crappy(=useless), always return 100 on Win81.
+        /// </summary>
+        /// <param name="hMonitor">Handle to monitor, which is returned from MonitorFromWindow() .</param>
+        /// <param name="pScale">Output the scale-factor, 100, 125, 150, ...</param>
+        /// <returns>HRESULT</returns>
+        [DllImport("Shcore.dll")]
+        public static extern int GetScaleFactorForMonitor(IntPtr hMonitor, out int pScale);
+
+
+        /// <summary>
         /// This Win81 API is useless here.
         /// </summary>
         /// <param name="hWnd"></param>
@@ -1031,7 +1043,7 @@ namespace WindowFinder
         /// </summary>
         /// <param name="hwnd">The target HWND. If Zero, get DPI for own process.</param>
         /// <returns>DPI value 96, 120, 144 etc.</returns>
-        public static int Win81_GetWindowDpi(IntPtr hwnd)
+        public static int Win81_GetWindowDpi_tricky(IntPtr hwnd)
         {
             Debug.Assert(IsWin81_or_above());
 
