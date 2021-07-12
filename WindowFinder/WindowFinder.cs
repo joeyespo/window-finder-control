@@ -396,7 +396,17 @@ namespace WindowFinder
 
             g.CopyFromScreen(rt.left, rt.top, 0, 0, new Size(rt.Width, rt.Height));
 
-            Clipboard.SetImage(bm);
+            try
+            {
+                Clipboard.SetImage(bm);
+            }
+            catch (Exception e)
+            {
+                // Occasionally, we can not open the Clipboard.
+                // Windows may report HRESULT=0x800401D0 (OpenClipboard Failed),
+                // so catch it to avoid program crash.
+                Debug.WriteLine(e);
+            }
         }
 
         private void picTarget_KeyDown(object sender, KeyEventArgs e)
