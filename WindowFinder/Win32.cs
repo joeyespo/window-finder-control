@@ -333,27 +333,33 @@ namespace WindowFinder
                 {
                     is_rtp_accurate = true;
                 }
-                else if (Screen.AllScreens.Length==1) 
+                else 
                 {
-                    // only one monitor, and the calling process is non-Permon-aware
+                    // For DPI-unaware and SysDpi-aware calling process:
+
                     int sysdpi = DpiUtilities.Win7_SystemDpi();
 
                     if(! DpiUtilities.IsSelfProcessDPIAware())
                     {
-                        // In other word, if self-process is SysDpi-aware or Permon-aware,
-                        // Don't do this DoScale().
+                        // In other word, if self-process is SysDpi-aware, don't do this DoScale().
                         rtp.DoScale((float)sysdpi/96);
                     }
 
-                    is_rtp_accurate = true;
-                }
-                else
-                {
-                    is_rtp_accurate = false;
+                    if (Screen.AllScreens.Length == 1)
+                    {
+                        is_rtp_accurate = true;
+                    }
+                    else
+                    {
+                        is_rtp_accurate = false;
 
-                    // [2021-06-28] Todo:
-                    // Maybe, with the help of DwmGetWindowAttribute(DWMWA_EXTENDED_FRAME_BOUNDS),
-                    // we can get a quite-accurate scale-factor for the target-window.
+                        // [2021-06-28] Todo:
+                        // Due to lack of per-Monitor API on Win81... When Win81 applies mixed-mode 
+                        // DPI scaling to different monitors,  I cannot guarantee rtp's correctness.
+                        //
+                        // Maybe, with the help of DwmGetWindowAttribute(DWMWA_EXTENDED_FRAME_BOUNDS),
+                        // we can get a quite-accurate scale-factor for the target-window.
+                    }
                 }
             }
 
