@@ -338,7 +338,12 @@ namespace WindowFinder
                     // only one monitor, and the calling process is non-Permon-aware
                     int sysdpi = DpiUtilities.Win7_SystemDpi();
 
-                    rtp.DoScale((float)sysdpi/96);
+                    if(! DpiUtilities.IsSelfProcessDPIAware())
+                    {
+                        // In other word, if self-process is SysDpi-aware or Permon-aware,
+                        // Don't do this DoScale().
+                        rtp.DoScale((float)sysdpi/96);
+                    }
 
                     is_rtp_accurate = true;
                 }
