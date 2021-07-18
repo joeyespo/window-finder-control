@@ -295,7 +295,7 @@ namespace WindowFinder
 
             IntPtr hwndToplevel = GetMyToplevelWnd(hWnd);
 
-            if (DpiUtilities.IsWin7() && (DpiUtilities.Win7_SystemDpi() > 96))
+            if (DpiUtilities.IsWin7() && (DpiUtilities.Win_GetPrimaryScreenDpi() > 96))
             {
                 rtp = Win7_HighDpiAdjustRect(hWnd, ref rtv);
             }
@@ -327,7 +327,7 @@ namespace WindowFinder
                 {
                     // For DPI-unaware and SysDpi-aware calling process:
 
-                    int sysdpi = DpiUtilities.Win7_SystemDpi();
+                    int sysdpi = DpiUtilities.Win_GetPrimaryScreenDpi(true);
 
                     if(! DpiUtilities.IsSelfProcessDPIAware())
                     {
@@ -401,7 +401,7 @@ namespace WindowFinder
         private static RECT Win7_HighDpiAdjustRect(IntPtr hwnd0, ref RECT rect0)
         {
             Debug.Assert(DpiUtilities.IsWin7());
-            Debug.Assert(DpiUtilities.Win7_SystemDpi() > 96);
+            Debug.Assert(DpiUtilities.Win_GetPrimaryScreenDpi() > 96);
 
             RECT rect0_physical = rect0; // adjust soon
 
@@ -417,7 +417,7 @@ namespace WindowFinder
             //Debug.WriteLine($"DWM: width {rttop.Width} , height {rttop.Height}");
 
             bool isCallerStdDpi = DpiUtilities.Win7_IsCallerStdDpi();
-            int sysdpi = DpiUtilities.Win7_SystemDpi();
+            int sysdpi = DpiUtilities.Win_GetPrimaryScreenDpi();
 
             float scale_factor = (float)sysdpi / 96;
 
@@ -1185,10 +1185,15 @@ namespace WindowFinder
         /// This code works both on "caller is 96dpi" and "caller is System-DPI".
         /// Should work prior to Win10.1607.
         /// </summary>
+        /// <param name="need_fresh">On Win81, when "Let me choose one scaling level for all my displays" 
+        /// is NOT ticked, changing DPI scaling does NOT require user logout and login.
+        /// This means, DESKTOPHORZRES and HORZRES value can change dynamically. 
+        /// So on Win81, the caller should pass in need_fresh=true to get fresh value.
+        /// </param>
         /// <returns></returns>
-        public static int Win7_SystemDpi()
+        public static int Win_GetPrimaryScreenDpi(bool need_fresh=false)
         {
-            if (s_win7_system_dpi > 0)
+            if (s_win7_system_dpi > 0 && ! need_fresh)
                 return s_win7_system_dpi;
 
             IntPtr hdc = Win32.GetDC(IntPtr.Zero);

@@ -42,7 +42,7 @@ namespace WindowFinder
         }
 
         public static int verMajor { get; private set; } = 2;
-        public static int verMinor { get; private set; } = 1;
+        public static int verMinor { get; private set; } = 2;
 
 
         void TimerCheckKey(object obj, EventArgs ea)
