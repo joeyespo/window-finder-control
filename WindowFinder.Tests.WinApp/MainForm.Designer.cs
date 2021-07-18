@@ -95,6 +95,8 @@ namespace TestControl
             this.txtWindowRect.ReadOnly = true;
             this.txtWindowRect.Size = new System.Drawing.Size(194, 20);
             this.txtWindowRect.TabIndex = 21;
+            this.toolTip1.SetToolTip(this.txtWindowRect, "RECT value return by GetWindowRect. No DPI-awareness switch before calling GetWin" +
+        "dowRect. ");
             // 
             // lblWinRect
             // 
