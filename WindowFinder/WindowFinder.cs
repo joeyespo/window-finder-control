@@ -598,12 +598,12 @@ namespace WindowFinder
                 if (targetWindow == IntPtr.Zero)
                 {
                     // highlight on for new window
-                    // Note: If I place this _snapframe.Show() after HighlightWindow_Overlaying(),
+                    // Note: If I place this _snapframe.Show() after HighlightWindow_SnapFrame(),
                     // the Snap-frame will be brought to front, which is not desired.
                     _snapframe.Show(); 
 
                     Win32.RECT rtp;
-                    bool accurate = Win32.HighlightWindow_Overlaying(hWnd, _snapframe.Handle, out rtp);
+                    bool accurate = Win32.HighlightWindow_SnapFrame(hWnd, _snapframe.Handle, out rtp);
 
                     string qm = accurate ? "" : "(?) ";
 

@@ -284,19 +284,9 @@ namespace WindowFinder
         /// <param name="hwndOverlay">the Snap-frame window.</param>
         /// <param name="rtp">Report physical(pixel) coordinate of the target hWnd.</param>
         /// <returns>Whether the returned rtp is accurate.</returns>
-        internal static bool HighlightWindow_Overlaying(IntPtr hWnd, IntPtr hwndOverlay, out RECT rtp)
+        internal static bool HighlightWindow_SnapFrame(IntPtr hWnd, IntPtr hwndOverlay, out RECT rtp)
         {
             bool is_rtp_accurate = true; // assume accurate
-
-            /* This is unnecessary for Win81 and Win10.1607+
-            IntPtr thread_oldctx = IntPtr.Zero;
-
-            if (IsAboveWin10_1607())
-            {
-                thread_oldctx =
-                    DpiUtilities.SetThreadDpiAwarenessContext(DpiUtilities.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
-            }
-            */
 
             RECT rtv = new RECT(); // v: implies virtual coordinate from API user's perspective
             GetWindowRect(hWnd, out rtv);
@@ -312,12 +302,12 @@ namespace WindowFinder
 
             Win32.SetWindowPos(hwndOverlay, Win32.HWND_TOP,
                 rtv.left, rtv.top, rtv.Width, rtv.Height
-            );
+                );
             //
             if (IsAboveWin10_1607() && !DpiUtilities.IsSelfPermonAware())
             {
                 // For non-Per-mon cases, we have to adjust rtv to get physical coordinates.
-                // Only be switching our thread to Per-mon-aware perspective, can we get the physical coords.
+                // Only by switching our thread to Per-mon-aware perspective, can we get the physical coords.
 
                 IntPtr thread_oldctx =
                     DpiUtilities.SetThreadDpiAwarenessContext(DpiUtilities.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
@@ -380,13 +370,6 @@ namespace WindowFinder
                     Win32.SetWindowPosFlags.NOMOVE | Win32.SetWindowPosFlags.NOSIZE);
                 //Debug.WriteLine($"### {(uint)hwndHigher:X8} -> {(uint)hwndOverlay:X8} -> {(uint)hwndToplevel:X8}");
             }
-
-            /* This is unnecessary for Win81 and Win10.1607+
-            if (IsAboveWin10_1607())
-            {
-                DpiUtilities.SetThreadDpiAwarenessContext(thread_oldctx); // restore ctx
-            }
-            */
 
             return is_rtp_accurate;
         }
