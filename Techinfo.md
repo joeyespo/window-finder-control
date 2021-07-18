@@ -51,3 +51,32 @@ For example, monitor #1(primary) is 1024x768 with 100% scaling, monitor 2(second
 ![Win81-500px-scaling125pct](Graphics/Screenshots/Win81-500px-scaling125pct.png)
 
 Frankly, I have not found a way to cope with this situation on Win81.
+
+
+## Windows 7 non-100% system DPI, ghost window problem
+
+When the following three are true on Win7,
+
+1. System DPI is non-100%, 150% for example.
+2. wcFinder is DPI-unaware program.
+3. Target window is an DPI-unaware program(can be wcFinder itself) which is scaled up to 150% on physical screen.
+
+Symptom: When the crosshair is dragged over some position left-and-top to the target window(outside target window), the target window or some of its child-window is mysteriously highlighted, as if there is a ghost window at the undesired location.
+
+This is a BUG of Windows 7, in API `ClientToScreen()`, which has been fixed in Windows 10, at least I see it gone on Win10.1909. 
+
+The ghost window is at the imagined 100%-scaling location of the target window. Why this happens? Observing the "Mouse at screen" X, Y value reported by TestApp, we can see:
+* When the mouse pointer is outside the target window, the resulting X,Y from `ClientToScreen()` is screen coordinate.
+* When the mouse pointer is inside the target window, the resulting X,Y from `ClientToScreen()` is in target-window's "back-off 100% scaling" perspective.
+
+As depicted in the figures below, there are two mouse positions that will can cause `ClientToScreen()` to report X=580 and Y=150, one outside target window, another inside target window.
+
+![Win7-ghost-window-out](Graphics/Screenshots/Win7-ghost-window-out.png)
+
+![Win7-not-ghost-window-in](Graphics/Screenshots/Win7-not-ghost-window-in.png)
+
+
+So the outside one causes ghost window symptom.
+
+In Win10.1909, for DPI-unaware wcFinder caller, `ClientToScreen()` always reports value in "back-off 100% scaling" perspective, thus gone the bug.
+

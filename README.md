@@ -49,3 +49,9 @@ screenshot to Clipboard. You can use a tool like [Free Clipboard Viewer](https:/
 to preview the screenshot. Note that this an extra feature from the TestApp, not the core feature provided
 by wcFinder control.
 
+
+Some technical info
+===================
+
+[Check this page.](Techinfo.md)
+
